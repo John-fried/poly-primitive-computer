@@ -45,32 +45,12 @@ void free_array(char **arr, size_t n)
 		if (arr[i])
 			free(arr[i]);
 	}
+	free(arr);
 }
 
 void interpret(struct PPC_Ctx *ctx)
 {
 	if (ctx->runtime->mode == MODE_DIRECT) {	
-		/* HANDLE RUN COMMAND */
-		if (strcmp(ctx->argv[0], "RUN") == 0) {
-			struct PPC_Ctx run_ctx;
-			char *code;
-
-			for (int i = 0; i <= ctx->runtime->code.max_line; i++) {
-					if (!ctx->runtime->code.code[i]) continue;
-
-					code = strdup(ctx->runtime->code.code[i]);
-
-					if (strlen(code) <= 1) continue;
-
-					init_ctx(&run_ctx);
-
-					readtoken(code, &run_ctx);
-					interpret(&run_ctx);
-					free(code);
-			}
-			return;
-		}
-
 		/* HANDLE CODE LINE */
 		if (isdigit(ctx->argv[0][0]) != 0) {
 			int line = atoi(ctx->argv[0]);

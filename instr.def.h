@@ -13,6 +13,8 @@ struct PPC_Instr {
 #define MKINSTR(name) void name ## _handler(struct PPC_Ctx *ctx)
 #define MKINSTR_L(name) {#name, name ## _handler},
 
+// will be replaced as: void NAME_handler(...)
+MKINSTR(RUN);
 MKINSTR(HOME);
 MKINSTR(MOV);
 MKINSTR(CREAT);
@@ -21,6 +23,8 @@ MKINSTR(PRINT);
 MKINSTR(TRANS);
 
 struct PPC_Instr instr_list[] = {
+	// will be replaced as: {NAME, NAME_handler},
+	MKINSTR_L(RUN)
 	MKINSTR_L(HOME)
 	MKINSTR_L(MOV)
 	MKINSTR_L(CREAT)

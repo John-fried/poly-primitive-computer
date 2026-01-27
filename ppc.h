@@ -34,4 +34,8 @@ struct PPC_Ctx {
 
 extern struct PPC_Runtime ppc_runtime;
 
+//fn
+void init_ctx(struct PPC_Ctx *ctx);
+void interpret(struct PPC_Ctx *ctx);
+
 #endif /* PPC_H */

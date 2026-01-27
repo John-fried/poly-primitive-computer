@@ -1,0 +1,24 @@
+#include "parser.h"
+#include "ppc.h"
+
+#include <string.h>
+#include <stdlib.h>
+
+void RUN_handler(struct PPC_Ctx *ctx) {
+	struct PPC_Ctx run_ctx;
+	char *code;
+
+	for (int i = 0; i <= ctx->runtime->code.max_line; i++) {
+			if (!ctx->runtime->code.code[i]) continue;
+
+			code = strdup(ctx->runtime->code.code[i]);
+
+			if (strlen(code) <= 1) continue;
+
+			init_ctx(&run_ctx);
+
+			readtoken(code, &run_ctx);
+			interpret(&run_ctx);
+			free(code);
+	}
+}
