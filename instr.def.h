@@ -18,6 +18,7 @@ MKINSTR(MOV);
 MKINSTR(CREAT);
 MKINSTR(PUSH);
 MKINSTR(PRINT);
+MKINSTR(TRANS);
 
 struct PPC_Instr instr_list[] = {
 	MKINSTR_L(HOME)
@@ -25,6 +26,7 @@ struct PPC_Instr instr_list[] = {
 	MKINSTR_L(CREAT)
 	MKINSTR_L(PUSH)
 	MKINSTR_L(PRINT)
+	MKINSTR_L(TRANS)
 };
 #define INST_COUNT ((int)(sizeof(instr_list) / sizeof(instr_list[0])))
 

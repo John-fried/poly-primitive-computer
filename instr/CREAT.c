@@ -18,7 +18,6 @@ void CREAT_handler(struct PPC_Ctx *ctx)
 	}
 
 	ctx->runtime->slots = tmp;
-	ctx->runtime->slots_count++;
 	ctx->runtime->slots_capacity = new_capacity;
 }
 

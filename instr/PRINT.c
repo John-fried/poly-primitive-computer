@@ -15,6 +15,5 @@ void PRINT_handler(struct PPC_Ctx *ctx)
 		int idx = atoi(ctx->argv[i]);
 		putchar(ctx->runtime->slots[idx].data);
 	}
-
 	putchar('\n');
 }

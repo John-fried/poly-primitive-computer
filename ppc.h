@@ -13,12 +13,17 @@ typedef struct {
 	int data;
 } MemorySlot;
 
+struct PPC_Code {
+	char **code;
+	int max_line;
+};
+
 struct PPC_Runtime {
 	int pointer; // the current pointer index
 	MemorySlot *slots;
+	struct PPC_Code code;
 	RunMode mode;
-	int slots_count;
-	int slots_capacity; // max capacity before realloc
+	int slots_capacity;
 };
 
 struct PPC_Ctx {
