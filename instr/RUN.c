@@ -4,7 +4,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-void RUN_handler(struct PPC_Ctx *ctx) {
+void RUN_handler(struct PPC_Ctx *ctx)
+{
 	struct PPC_Ctx run_ctx;
 	char *code;
 
