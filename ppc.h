@@ -21,9 +21,11 @@ struct PPC_Code {
 struct PPC_Runtime {
 	int pointer; // the current pointer index
 	MemorySlot *slots;
+	int slots_capacity;
+
+	//code - 10 ..., stores the code & the run mode DIRECT & CODE
 	struct PPC_Code code;
 	RunMode mode;
-	int slots_capacity;
 };
 
 struct PPC_Ctx {

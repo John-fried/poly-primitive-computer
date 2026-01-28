@@ -1,5 +1,6 @@
 #include "ppc.h"
 #include "error.h"
+#include "mmagutil.h"
 
 #include <stdlib.h>
 
@@ -10,8 +11,7 @@ void PUSH_handler(struct PPC_Ctx *ctx)
 	int src = atoi(ctx->argv[1]);
 	int dest = (ctx->argc > 2) ? atoi(ctx->argv[2]) : 
 		ctx->runtime->pointer;
-
-	ctx->runtime->slots[dest].data = src;
+	mmag_write(dest, src);
 }
 
 
