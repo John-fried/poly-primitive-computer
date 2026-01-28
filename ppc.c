@@ -69,7 +69,9 @@ void interpret(struct PPC_Ctx *ctx)
 
 			}
 
+			ctx->line = line;
 			ctx->runtime->code.code[line] = strdup(code);
+
 			if (ctx->runtime->code.max_line < line) 
 				ctx->runtime->code.max_line = line;
 

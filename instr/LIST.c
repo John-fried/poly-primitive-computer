@@ -12,7 +12,7 @@ void LIST_handler(struct PPC_Ctx *ctx)
 
 		if (!code || strlen(code) <= 1) continue;
 
-		printf("%d: %s\n", i, code);
+		printf("%d %s\n", i, code);
 	}
 	printf("EOF\n");
 }

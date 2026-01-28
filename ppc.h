@@ -27,12 +27,14 @@ struct PPC_Runtime {
 };
 
 struct PPC_Ctx {
+	int line;
 	int argc;
 	char *argv[ARGSSIZE];
 	struct PPC_Runtime *runtime;
 };
 
-extern struct PPC_Runtime ppc_runtime;
+extern struct PPC_Runtime ppc_runtime; // global runtime context
+extern struct PPC_Ctx ppc_context; // global context
 
 //fn
 void init_ctx(struct PPC_Ctx *ctx);

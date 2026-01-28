@@ -17,6 +17,7 @@ void RUN_handler(struct PPC_Ctx *ctx)
 			if (strlen(code) <= 1) continue;
 
 			init_ctx(&run_ctx);
+			run_ctx.runtime->mode = MODE_CODE;
 
 			readtoken(code, &run_ctx);
 			interpret(&run_ctx);
