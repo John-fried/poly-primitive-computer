@@ -3,9 +3,11 @@
  **/
 
 #include "ppc.h"
+#include "instr.def.h"
+
 #include <stdio.h>
 
-void TRANS_handler(struct PPC_Ctx *ctx)
+MKINSTR(TRANS)
 {
 	if (ctx->argc == 1) return;
 

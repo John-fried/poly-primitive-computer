@@ -1,11 +1,12 @@
 /* LIST, ppc builtin command to see your code */
 
 #include "ppc.h"
+#include "instr.def.h"
 
 #include <stdio.h>
 #include <string.h>
 
-void LIST_handler(struct PPC_Ctx *ctx)
+MKINSTR(LIST)
 {
 	for (int i = 0; i <= ctx->runtime->code.max_line; i++) {
 		char *code = ctx->runtime->code.code[i];

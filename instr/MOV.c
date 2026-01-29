@@ -1,11 +1,12 @@
 #include "ppc.h"
 #include "error.h"
 #include "mmagutil.h"
+#include "instr.def.h"
 
 #include <stdlib.h>
 #include <string.h>
 
-void MOV_handler(struct PPC_Ctx *ctx)
+MKINSTR(MOV)
 {
 	if (ctx->argc == 1) return;
 

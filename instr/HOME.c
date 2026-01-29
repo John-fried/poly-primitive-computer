@@ -1,8 +1,9 @@
 #include "ppc.h"
+#include "instr.def.h"
 
 #include <stdio.h>
 
-void HOME_handler(struct PPC_Ctx *ctx)
+MKINSTR(HOME)
 {
 	(void) ctx;
 	printf("\033[H\033[2J");

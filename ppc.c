@@ -2,6 +2,7 @@
 #include "parser.h"
 #include "color.h"
 #include "console.h"
+#define MAKE_INSTR
 #include "instr.def.h"
 
 #include <stdlib.h>

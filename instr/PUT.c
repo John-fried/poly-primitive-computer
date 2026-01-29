@@ -1,10 +1,11 @@
 #include "ppc.h"
 #include "error.h"
 #include "mmagutil.h"
+#include "instr.def.h"
 
 #include <stdlib.h>
 
-void PUSH_handler(struct PPC_Ctx *ctx)
+MKINSTR(PUT)
 {
 	if (ctx->argc == 1) return;
 

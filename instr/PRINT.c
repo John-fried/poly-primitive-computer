@@ -1,10 +1,11 @@
 #include "ppc.h"
 #include "mmagutil.h"
+#include "instr.def.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 
-void PRINT_handler(struct PPC_Ctx *ctx)
+MKINSTR(PRINT)
 {
 	if (ctx->argc == 1) {
 		putchar(mmag_get(ctx->runtime->pointer));

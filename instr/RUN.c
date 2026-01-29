@@ -1,10 +1,11 @@
 #include "parser.h"
 #include "ppc.h"
+#include "instr.def.h"
 
 #include <string.h>
 #include <stdlib.h>
 
-void RUN_handler(struct PPC_Ctx *ctx)
+MKINSTR(RUN)
 {
 	struct PPC_Ctx run_ctx;
 	char *code;
