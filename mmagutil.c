@@ -7,7 +7,7 @@
 #include <errno.h>
 
 /* _out_bounds_check - throw -1 if the input idx was so big
- *				  (0 or lower capacity will return -3)
+ *(0 or lower capacity will return -3)
  * nothing conditional was satisfied will return its current capacity
  */
 static int _out_bounds_check(int idx)
