@@ -34,9 +34,34 @@ void init(void)
 				   sizeof(MemorySlot));
 	ppc_runtime.mode = MODE_DIRECT;
 	ppc_runtime.code.max_line = 0;
-	ppc_runtime.code.code = (char **) calloc(300, sizeof(char *));
+	ppc_runtime.code.size = 16;
+	ppc_runtime.code.code = (char **) calloc(ppc_runtime.code.size, sizeof(char *));
 
 	init_ctx(&ppc_context);
+}
+
+/* Utility to realloc code without deleting the data*/
+void realloc_codesize(void)
+{
+	//dont realloc if its was still smaller/lower
+	if (ppc_runtime.code.max_line <= ppc_runtime.code.size) return;
+
+	int old_size = ppc_runtime.code.size;
+	int new_size =  (ppc_runtime.code.max_line + 1) * sizeof(char *);
+
+	void *tmp = realloc(ppc_runtime.code.code, new_size);
+
+	if (!tmp) {
+		console_err("Realloc failed for code size");
+		return;
+	}
+
+	ppc_runtime.code.code = (char **) tmp;
+	ppc_runtime.code.size = new_size;
+
+	for (int i = old_size; i < ppc_runtime.code.max_line; i++) {
+		ppc_runtime.code.code[i] = NULL;
+	}
 }
 
 /* Utility to free an array, using looping for size_t n */
@@ -58,8 +83,12 @@ void interpret(struct PPC_Ctx *ctx)
 			char code[LINESIZE];
 			char *ptr = code;
 
-			// clear code
+			if (ctx->runtime->code.max_line < line)
+				ctx->runtime->code.max_line = line;
+
+			// clear code & realloc
 			memset(code, 0, sizeof(code));
+			realloc_codesize();
 
 			if (ctx->argc > 1) {
 				for (int i = 1; i < ctx->argc; i++) {
@@ -71,9 +100,6 @@ void interpret(struct PPC_Ctx *ctx)
 			}
 
 			ctx->runtime->code.code[line] = strdup(code);
-
-			if (ctx->runtime->code.max_line < line)
-				ctx->runtime->code.max_line = line;
 
 			return;
 		}
@@ -108,6 +134,7 @@ void interpreter_loop(void)
 
 void interpreter_exit(void)
 {
+	putchar('\n');
 	free(ppc_runtime.slots);
 	free_array(ppc_runtime.code.code, ppc_runtime.code.max_line);
 }

@@ -16,6 +16,7 @@ typedef struct {
 struct PPC_Code {
 	char **code;
 	int max_line;
+	int size; // size of codeline, (used if maxline > size realloc)
 };
 
 struct PPC_Runtime {
