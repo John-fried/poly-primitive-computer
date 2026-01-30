@@ -19,6 +19,7 @@ MKINSTR(RUN)
 
 			init_ctx(&run_ctx);
 			run_ctx.runtime->mode = MODE_CODE;
+			ppc_context.line = i;
 
 			readtoken(code, &run_ctx);
 			interpret(&run_ctx);

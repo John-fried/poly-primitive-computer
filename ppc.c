@@ -16,8 +16,8 @@
 struct PPC_Runtime ppc_runtime;
 struct PPC_Ctx ppc_context;
 
-/* utility to initialize an empty PPC_Ctx struct, 
- * prevent from garbage data from a uininitialized struct 
+/* utility to initialize an empty PPC_Ctx struct,
+ * prevent from garbage data from a uininitialized struct
  */
 void init_ctx(struct PPC_Ctx *ctx)
 {
@@ -30,12 +30,12 @@ void init(void)
 {
 	ppc_runtime.pointer = 0;
 	ppc_runtime.slots_capacity = 1;
-	ppc_runtime.slots = malloc(ppc_runtime.slots_capacity * 
+	ppc_runtime.slots = malloc(ppc_runtime.slots_capacity *
 				   sizeof(MemorySlot));
 	ppc_runtime.mode = MODE_DIRECT;
 	ppc_runtime.code.max_line = 0;
 	ppc_runtime.code.code = (char **) calloc(300, sizeof(char *));
-	
+
 	init_ctx(&ppc_context);
 }
 
@@ -51,29 +51,28 @@ void free_array(char **arr, size_t n)
 
 void interpret(struct PPC_Ctx *ctx)
 {
-	if (ctx->runtime->mode == MODE_DIRECT) {	
+	if (ctx->runtime->mode == MODE_DIRECT) {
 		/* HANDLE CODE LINE */
 		if (isdigit(ctx->argv[0][0]) != 0) {
 			int line = atoi(ctx->argv[0]);
 			char code[LINESIZE];
 			char *ptr = code;
-		
+
 			// clear code
 			memset(code, 0, sizeof(code));
-	
+
 			if (ctx->argc > 1) {
 				for (int i = 1; i < ctx->argc; i++) {
 					strcpy(ptr, ctx->argv[i]);
-					ptr += strlen(ptr);
-					strcpy(ptr++, " ");
+					ptr += strlen(ctx->argv[i]);
+					if (i < ctx->argc - 1) strcpy(ptr++, " ");
 				}
 
 			}
 
-			ctx->line = line;
 			ctx->runtime->code.code[line] = strdup(code);
 
-			if (ctx->runtime->code.max_line < line) 
+			if (ctx->runtime->code.max_line < line)
 				ctx->runtime->code.max_line = line;
 
 			return;
@@ -86,7 +85,7 @@ void interpret(struct PPC_Ctx *ctx)
 			return;
 		}
 	}
-	
+
 	console_err("Unknown instr %s.", ctx->argv[0]);
 }
 
