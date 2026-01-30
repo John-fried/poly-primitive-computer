@@ -1,8 +1,8 @@
 #include "ppc.h"
+#include "eval.h"
 #include "parser.h"
 #include "color.h"
 #include "console.h"
-#define MAKE_INSTR
 #include "instr.def.h"
 
 #include <stdlib.h>
@@ -12,7 +12,7 @@
 #include <ctype.h>
 #include <errno.h>
 
-// init struct
+// init
 struct PPC_Runtime ppc_runtime;
 struct PPC_Ctx ppc_context;
 
@@ -40,30 +40,6 @@ void init(void)
 	init_ctx(&ppc_context);
 }
 
-/* Utility to realloc code without deleting the data*/
-void realloc_codesize(void)
-{
-	//dont realloc if its was still smaller/lower
-	if (ppc_runtime.code.max_line <= ppc_runtime.code.size) return;
-
-	int old_size = ppc_runtime.code.size;
-	int new_size =  (ppc_runtime.code.max_line + 1) * sizeof(char *);
-
-	void *tmp = realloc(ppc_runtime.code.code, new_size);
-
-	if (!tmp) {
-		console_err("Realloc failed for code size");
-		return;
-	}
-
-	ppc_runtime.code.code = (char **) tmp;
-	ppc_runtime.code.size = new_size;
-
-	for (int i = old_size; i < ppc_runtime.code.max_line; i++) {
-		ppc_runtime.code.code[i] = NULL;
-	}
-}
-
 /* Utility to free an array, using looping for size_t n */
 void free_array(char **arr, size_t n)
 {
@@ -74,53 +50,12 @@ void free_array(char **arr, size_t n)
 	free(arr);
 }
 
-void interpret(struct PPC_Ctx *ctx)
-{
-	if (ctx->runtime->mode == MODE_DIRECT) {
-		/* HANDLE CODE LINE */
-		if (isdigit(ctx->argv[0][0]) != 0) {
-			int line = atoi(ctx->argv[0]);
-			char code[LINESIZE];
-			char *ptr = code;
-
-			if (ctx->runtime->code.max_line < line)
-				ctx->runtime->code.max_line = line;
-
-			// clear code & realloc
-			memset(code, 0, sizeof(code));
-			realloc_codesize();
-
-			if (ctx->argc > 1) {
-				for (int i = 1; i < ctx->argc; i++) {
-					strcpy(ptr, ctx->argv[i]);
-					ptr += strlen(ctx->argv[i]);
-					if (i < ctx->argc - 1) strcpy(ptr++, " ");
-				}
-
-			}
-
-			ctx->runtime->code.code[line] = strdup(code);
-
-			return;
-		}
-	}
-
-	for (int i = 0; i < INST_COUNT; i++) {
-		if (strcmp(instr_list[i].name, ctx->argv[0]) == 0) {
-			instr_list[i].handler(ctx);
-			return;
-		}
-	}
-
-	console_err("Unknown instr %s.", ctx->argv[0]);
-}
-
 void interpreter_loop(void)
 {
 	char line[LINESIZE];
 
 	while (1) {
-		printf("%s]", BRIGHT_GREEN);
+		printf("] ");
 		if (fgets(line, sizeof(line), stdin) == NULL)
 			break;
 

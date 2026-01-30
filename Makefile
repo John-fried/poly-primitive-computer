@@ -1,5 +1,5 @@
 TARGET = ppc
-FLAGS = -MMD -Wall -Wextra -Wpedantic -I.
+FLAGS = -MMD -Wall -Wextra -Wpedantic -I. -O3
 CC = gcc
 
 BUILD_DIR = build
