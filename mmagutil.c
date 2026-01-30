@@ -35,7 +35,7 @@ int mmag_expand(int size)
 
 	void *tmp = realloc(ppc_runtime.slots, new_capacity);
 	if (!tmp) {
-		console_err("%s", strerror(errno));
+		console_errno();
 		return -1;
 	}
 
@@ -52,14 +52,12 @@ int mmag_write(int idx, int c)
 	int bounds = _out_bounds_check(idx);
 
 	if (bounds <= -3) {
-		console_err("Out of memory");
+		console_err("invalid memory size. at size %d", ppc_runtime.slots_capacity);
 		return -1;
 	}
 
-	if (bounds < 0) {
-		console_err("<segv> Out-of-bounds write");
-		return -1;
-	}
+	if (bounds < 0)
+		console_warn("Out-of-bounds write");
 
 	ppc_runtime.slots[idx].data = c;
 	return 0;

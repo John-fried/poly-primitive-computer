@@ -4,6 +4,8 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
+#include <errno.h>
 
 static void _console_diag(const char *prefix, const char *fmt, va_list ap, int line)
 {
@@ -26,4 +28,9 @@ void console_warn(const char *fmt, ...)
 	va_list ap;
 	va_start(ap, fmt);
 	_console_diag(YELLOW"W"RESET, fmt, ap, ppc_context.line);
+}
+
+void console_errno(void)
+{
+	console_err("%s", strerror(errno));
 }

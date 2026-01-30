@@ -2,11 +2,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <string.h>
 
 void readtoken(char *line, struct PPC_Ctx *ctx)
 {
-	int i = 0;
+        int i = 0;
 	ctx->argc = 0;
 	char *token;
 
@@ -47,4 +48,12 @@ void find_range(const char *str, int *min, int *max)
         // default to 1
         *min = 0;
         *max = 1;
+}
+
+int hasdigit(const char *str)
+{
+        while (*str)
+                if (!isdigit(*str++)) return -1;
+
+        return 0;
 }

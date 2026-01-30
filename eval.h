@@ -3,7 +3,7 @@
 
 #include "ppc.h"
 
-void realloc_codesize(void);
+int realloc_codesize(void);
 void interpret(struct PPC_Ctx *ctx);
 
 #endif /* EVAL_H */
