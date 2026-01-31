@@ -62,7 +62,7 @@ void interpreter_loop(void)
 		if (strlen(line) <= 1) continue;
 
 		ppc_context.runtime->mode = MODE_DIRECT;
-		readtoken(line, &ppc_context);
+		parse_line(line, &ppc_context);
 		interpret(&ppc_context);
 	}
 }

@@ -5,18 +5,35 @@
 #include <ctype.h>
 #include <string.h>
 
-void readtoken(char *line, struct PPC_Ctx *ctx)
+static void _readtoken(char *line, struct PPC_Ctx *ctx)
 {
         int i = 0;
-	ctx->argc = 0;
-	char *token;
+        ctx->argc = 0;
+        char *token;
 
-	while ((token = strsep(&line, " \n\t\r")) != NULL && i < ARGSSIZE) {
-		if (*token == '\0') continue;
+        while ((token = strsep(&line, PARSER_TOK_DELIM)) != NULL && i < ARGSSIZE) {
+                if (*token == '\0') continue;
 
-		ctx->argv[i++] = token;
-		ctx->argc++;
-	}
+                ctx->argv[i++] = token;
+                ctx->argc++;
+        }
+}
+
+char *remove_comment(const char *line)
+{
+        char *string = strdup(line);
+        char *found;
+
+        if ((found = strstr(string, PARSER_TOK_COMMENT)))
+                *found = 0;
+
+        return string;
+}
+
+void parse_line(char *line, struct PPC_Ctx *ctx)
+{
+        ctx->full_string = strdup(line);
+        _readtoken(line, ctx);
 }
 
 void find_range(const char *str, int *min, int *max)

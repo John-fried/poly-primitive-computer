@@ -1,5 +1,6 @@
 /* eval.c - evaluate instruction or any operation */
 
+#include "ppc.h"
 #include "eval.h"
 #define _MAKE_INSTR_USES_
 #include "instr.def.h"
@@ -15,24 +16,26 @@
 int realloc_codesize(void)
 {
 	//dont realloc if its was still smaller/lower
-	if (ppc_runtime.code.max_line <= ppc_runtime.code.size) return -1;
+	if (ppc_runtime.code.max_line < ppc_runtime.code.size) return 0;
 
-	int old_size = ppc_runtime.code.size;
-	int new_size =  (ppc_runtime.code.max_line + 1) * sizeof(char *);
+	int old_line = ppc_runtime.code.size;
+	int new_line = ppc_runtime.code.max_line + 1;
+	int new_byte_size =  new_line * sizeof(char *);
 
-	void *tmp = realloc(ppc_runtime.code.code, new_size);
+	void *tmp = realloc(ppc_runtime.code.code, new_byte_size);
 
 	if (!tmp) {
 		console_errno();
+		free(tmp);
 		return -1;
 	}
 
 	ppc_runtime.code.code = (char **) tmp;
-	ppc_runtime.code.size = new_size;
+	ppc_runtime.code.size = new_line;
 
-	for (int i = old_size; i < ppc_runtime.code.max_line; i++) {
+	for (int i = old_line; i < new_line; i++)
 		ppc_runtime.code.code[i] = NULL;
-	}
+
 	return 0;
 }
 
@@ -46,14 +49,15 @@ void interpret(struct PPC_Ctx *ctx)
 			int line = atoi(ctx->argv[0]);
 			char code[LINESIZE];
 			char *ptr = code;
+			struct PPC_Code *code_ctx = &ctx->runtime->code;
 
 			if (old_line < line)
-				ctx->runtime->code.max_line = line;
+				code_ctx->max_line = line;
 
 			// clear code & realloc
 			memset(code, 0, sizeof(code));
 			if (realloc_codesize() != 0) {
-				ctx->runtime->code.max_line = old_line;
+				code_ctx->max_line = old_line;
 				return;
 			}
 
@@ -66,6 +70,9 @@ void interpret(struct PPC_Ctx *ctx)
 
 			}
 
+			/* cleanup if any & fill */
+			if (code_ctx->code[line] != NULL)
+				free(code_ctx->code[line]);
 			ctx->runtime->code.code[line] = strdup(code);
 			return;
 		}
@@ -76,13 +83,15 @@ exec_as_instr: {
 		for (int i = 0; i < INST_COUNT; i++) {
 			if (strcmp(instr_list[i].name, ctx->argv[0]) == 0) {
 				//TODO: "if (!should_execute_instr(instr_list[i])) return;" add check here, example for attribute checking
+				char *line = strdup(ctx->full_string);
+				parse_line(remove_comment(line), ctx);
 
 				instr_list[i].handler(ctx);
 				return;
 			}
 		}
 
-		console_err("Unknown instr %s.", ctx->argv[0]);
+		console_err("%s not found", ctx->argv[0]);
 	}
 }
 

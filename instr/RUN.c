@@ -19,9 +19,9 @@ MKINSTR(RUN)
 
 			init_ctx(&run_ctx);
 			run_ctx.runtime->mode = MODE_CODE;
-			ppc_context.line = i;
+			ppc_context.line = i;//accurate error line tracking
 
-			readtoken(code, &run_ctx);
+			parse_line(code, &run_ctx);
 			interpret(&run_ctx);
 			free(code);
 	}

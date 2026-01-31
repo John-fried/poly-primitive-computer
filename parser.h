@@ -3,12 +3,20 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#define PARSER_TOK_DELIM " \n\t\r"
+#define PARSER_TOK_COMMENT ";"
+
 #include "ppc.h"
 
-/* readtoken(line ctx) - utility to tokenize a string line into a
- * ctx buffer (stores to argv and argc)
+/* remove_comment(line) - remove a comment token from a string,
+ * return the final string
  */
-void readtoken(char *line, struct PPC_Ctx *ctx);
+char *remove_comment(const char *line);
+
+/* parse_line(line, ctx) - Utility to parse line and store parsed
+ * context into ctx
+ */
+void parse_line(char *line, struct PPC_Ctx *ctx);
 
 /* find_range(str, *min, *max) - utility to find range between
  * integrer N1..N2, and stores min/max integrer into min

@@ -24,15 +24,16 @@ struct PPC_Runtime {
 	MemorySlot *slots;
 	int slots_capacity;
 
-	//code - 10 ..., stores the code & the run mode DIRECT & CODE
+	/* code - "10 ...", stores the code */
 	struct PPC_Code code;
-	RunMode mode;
+	RunMode mode; //running mode
 };
 
 struct PPC_Ctx {
 	int line;
 	int argc;
 	char *argv[ARGSSIZE];
+	char *full_string;
 	struct PPC_Runtime *runtime;
 };
 

@@ -2,6 +2,7 @@
 
 #include "ppc.h"
 #include "instr.def.h"
+#include "color.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -9,11 +10,11 @@
 MKINSTR(LIST)
 {
 	for (int i = 0; i <= ctx->runtime->code.max_line; i++) {
+		if (!ctx->runtime->code.code[i]) continue;
 		char *code = ctx->runtime->code.code[i];
 
-		if (!code || strlen(code) <= 1) continue;
+		if (strlen(code) <= 1) continue;
 
-		printf("%d %s\n", i, code);
+		printf("  %-5d %s\n", i, code);
 	}
-	printf("EOF\n");
 }
