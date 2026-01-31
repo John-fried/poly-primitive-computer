@@ -16,14 +16,19 @@
 struct PPC_Runtime ppc_runtime;
 struct PPC_Ctx ppc_context;
 
-/* utility to initialize an empty PPC_Ctx struct,
- * prevent from garbage data from a uininitialized struct
- */
+
 void init_ctx(struct PPC_Ctx *ctx)
 {
 	ctx->runtime = &ppc_runtime;
 	ctx->argv[0] = NULL;
 	ctx->argc = 0;
+	ctx->full_string = NULL;
+}
+/* Utility to free context, avoiding the memory leak */
+void free_ctx(struct PPC_Ctx *ctx)
+{
+	if (ctx->full_string != NULL)
+		free(ctx->full_string);
 }
 
 void init(void)
@@ -34,7 +39,7 @@ void init(void)
 				   sizeof(MemorySlot));
 	ppc_runtime.mode = MODE_DIRECT;
 	ppc_runtime.code.max_line = 0;
-	ppc_runtime.code.size = 16;
+	ppc_runtime.code.size = INITIAL_CODESIZE;
 	ppc_runtime.code.code = (char **) calloc(ppc_runtime.code.size, sizeof(char *));
 
 	init_ctx(&ppc_context);
@@ -71,6 +76,7 @@ void interpreter_exit(void)
 {
 	putchar('\n');
 	free(ppc_runtime.slots);
+	free_ctx(&ppc_context);
 	free_array(ppc_runtime.code.code, ppc_runtime.code.max_line);
 }
 

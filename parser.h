@@ -11,7 +11,7 @@
 /* remove_comment(line) - remove a comment token from a string,
  * return the final string
  */
-char *remove_comment(const char *line);
+char *remove_comment(char *line);
 
 /* parse_line(line, ctx) - Utility to parse line and store parsed
  * context into ctx

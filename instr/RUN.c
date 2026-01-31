@@ -15,7 +15,10 @@ MKINSTR(RUN)
 
 			code = strdup(ctx->runtime->code.code[i]);
 
-			if (strlen(code) <= 1) continue;
+			if (strlen(code) <= 1) {
+				free(code);
+				continue;
+			}
 
 			init_ctx(&run_ctx);
 			run_ctx.runtime->mode = MODE_CODE;
@@ -23,6 +26,8 @@ MKINSTR(RUN)
 
 			parse_line(code, &run_ctx);
 			interpret(&run_ctx);
+
+			free_ctx(&run_ctx);
 			free(code);
 	}
 }

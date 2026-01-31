@@ -84,9 +84,11 @@ exec_as_instr: {
 			if (strcmp(instr_list[i].name, ctx->argv[0]) == 0) {
 				//TODO: "if (!should_execute_instr(instr_list[i])) return;" add check here, example for attribute checking
 				char *line = strdup(ctx->full_string);
-				parse_line(remove_comment(line), ctx);
+				line = remove_comment(line);
+				parse_line(line, ctx);
 
 				instr_list[i].handler(ctx);
+				free(line);
 				return;
 			}
 		}

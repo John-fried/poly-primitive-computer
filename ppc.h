@@ -3,6 +3,7 @@
 
 #define LINESIZE 256
 #define ARGSSIZE 64
+#define INITIAL_CODESIZE 8 // initial codeline size "8 ..."
 
 typedef enum {
 	MODE_DIRECT,
@@ -40,8 +41,16 @@ struct PPC_Ctx {
 extern struct PPC_Runtime ppc_runtime; // global runtime context
 extern struct PPC_Ctx ppc_context; // global context
 
-//fn
+
+/* utility to initialize an empty PPC_Ctx struct,
+ * prevent from garbage data from a uininitialized struct
+ */
 void init_ctx(struct PPC_Ctx *ctx);
+
+/* Utility to free context, avoiding the memory leak */
+void free_ctx(struct PPC_Ctx *ctx);
+
+/* Utility to execute instruction from context */
 void interpret(struct PPC_Ctx *ctx);
 
 #endif /* PPC_H */

@@ -19,19 +19,23 @@ static void _readtoken(char *line, struct PPC_Ctx *ctx)
         }
 }
 
-char *remove_comment(const char *line)
+char *remove_comment(char *line)
 {
-        char *string = strdup(line);
         char *found;
 
-        if ((found = strstr(string, PARSER_TOK_COMMENT)))
+        if ((found = strstr(line, PARSER_TOK_COMMENT)))
                 *found = 0;
 
-        return string;
+        return line;
 }
 
 void parse_line(char *line, struct PPC_Ctx *ctx)
 {
+        if (ctx->full_string != NULL) {
+                free(ctx->full_string);
+                ctx->full_string = NULL;
+        }
+
         ctx->full_string = strdup(line);
         _readtoken(line, ctx);
 }
