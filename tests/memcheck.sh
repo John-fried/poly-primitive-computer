@@ -1,18 +1,18 @@
 #!/bin/sh
 BINARY="./ppc"
-LOG_FILE="/tmp/memcheck.log.txt"
+LOG_FILE="/tmp/memcheck.ppc.log"
 
 # --error-exitcode=1 ensures valgrind returns 1 on any error or leak
 VG_CMD="valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1 --quiet"
+TEST=1 # test number
+STATUS=0 # exit-code
 
 log() {
 	echo "[$(date)]: $1"
 }
 
 echo "Starting tests..."
-echo "No error are allowed."
 echo "Check logs at: $LOG_FILE"
-echo
 
 if ! command -v valgrind > /dev/null 2>&1; then
 	log "Error: valgrind is not found on your system"
@@ -29,25 +29,40 @@ fi
 # Each variable is a separate session ending with EOF (Ctrl+D)
 TEST_1="10 EXP 10\n20 PUT 65 1\n30 PUT 66 2\n40 PUT 67 3\n50 PUT 68 4\n60 PUT 69 5\n70 PRINT 1..5\nRUN"
 
+#Reset log
+: > $LOG_FILE
+
 run_valgrind() {
-	log "Testing: $1"
+	echo "--- LOG START ---" >> $LOG_FILE
+	log "Test: $1"
 	# printf handles \n correctly for multi-line input
 	printf "%b" "$2" | $VG_CMD $BINARY >> "$LOG_FILE" 2>&1
+	STATUS=$?
 
-	if [ $? -eq 0 ]; then
-		log "Test $1 passed."
+	if [ $STATUS -eq 0 ]; then
+		log "Test $TEST ($1) passed."
 	else
-		log "Test $1 failed."
-		log "Check log at $LOG_FILE (if needed again)"
+		log "logs stored at $LOG_FILE"
 		echo
 
-		echo "On: $(date)" >> $LOG_FILE
-
-		echo "--- LOG START ---"
 		cat $LOG_FILE
 		echo '--- LOG END ---'
 
-		echo "\n[Failed]"
+		log "Test $TEST failed with status $STATUS"
+	fi
+
+	echo "" >> $LOG_FILE
+	echo "[test: \"$1\" $TEST]" >> $LOG_FILE
+	echo "'''" >> $LOG_FILE
+	echo "$2" >> $LOG_FILE
+	echo "'''" >> $LOG_FILE
+	echo "[On: $(date)]" >> $LOG_FILE
+	echo "[Status: $STATUS]" >> $LOG_FILE
+	echo "--- LOG END ---" >> $LOG_FILE
+	echo "" >> $LOG_FILE
+	TEST=$((TEST+1))
+
+	if [ $STATUS -ne 0 ]; then
 		exit 1
 	fi
 }
@@ -57,16 +72,10 @@ echo_phases() {
 	echo "--- Phase $1: $2 ---"
 }
 
-#reset log
-: > $LOG_FILE
-
-echo "--- Phase 1: Basic Init/Exit ---"
-run_valgrind "Null Input" ""
-
-echo_phases "1" "Instruction-test"
+echo_phases "1" "Program-test"
 
 # Loop through test cases
+run_valgrind "No input; fast exit" ""
 run_valgrind "Simple Program" "$TEST_1"
 
-log "SUCCESS: all tests was passed with exit-code 0"
-echo "\n[SUCCESS]"
+log "all tests passed with status $STATUS"
