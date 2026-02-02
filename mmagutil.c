@@ -26,12 +26,13 @@ static int _out_bounds_check(int idx)
 int mmag_expand(int size)
 {
 	if (size < 1) {
-		console_err("Expanding with %d", size);
+		console_err("Invalid size %d", size);
 		return -1;
 	}
 
 	int capacity = ppc_runtime.slots_capacity;
-	int new_capacity = capacity + size * sizeof(MemorySlot);
+	int add_capacity = capacity + size + 1;
+	int new_capacity = add_capacity * sizeof(MemorySlot);
 
 	void *tmp = realloc(ppc_runtime.slots, new_capacity);
 	if (!tmp) {
@@ -68,5 +69,17 @@ int mmag_write(int idx, int c)
 /* mmag_get(idx) - get and return value of memory idx */
 int mmag_get(int idx)
 {
+	int bounds = _out_bounds_check(idx);
+
+	if (bounds <= -3) {
+		console_err("Invalid size %d", ppc_runtime.slots_capacity);
+		return -1;
+	}
+
+	if (bounds < 0) {
+		console_err("Invalid read to %d", idx);
+		return -1;
+	}
+
 	return ppc_runtime.slots[idx].data;
 }

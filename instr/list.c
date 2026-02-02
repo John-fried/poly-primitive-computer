@@ -18,7 +18,7 @@ MKINSTR(list)
 
 		if (strlen(code) <= 1) continue;
 
-		printf("  %-5d %s\n", i, code);
+		printf("%d %s\n", i, code);
 	}
 
 	return (void *)(intptr_t)i;

@@ -8,33 +8,35 @@
 #define likely(x)     		__builtin_expect(!!(x), 1)
 #define unlikely(x)    		__builtin_expect(!!(x), 0)
 
+#include <stdint.h>
+
 typedef enum {
 	MODE_DIRECT,
 	MODE_CODE
 } RunMode;
 
 typedef struct {
-	int 			data;
+	uint8_t 		data;
 } MemorySlot;
 
 struct PPC_Code {
 	char **			code;
-	int 			max_line;
-	int 			size;
+	uint16_t 		max_line;
+	uint16_t 		size;
 };
 
 struct PPC_Runtime {
-	int 			pointer;
+	uint16_t 		pointer;
 	MemorySlot *		slots;
-	int 			slots_capacity;
+	uint16_t 		slots_capacity;
 
 	struct 			PPC_Code code;
 	RunMode 		mode;
 };
 
 struct PPC_Ctx {
-	int 			line;
-	int 			argc;
+	uint16_t 		line;
+	uint8_t 		argc;
 	char *			argv[ARGSSIZE];
 	char *			full_string;
 	struct PPC_Runtime *	runtime;
