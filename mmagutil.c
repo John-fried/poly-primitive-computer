@@ -15,7 +15,7 @@ int out_bounds_check(int idx)
 {
 	int capacity = ppc_runtime.slots_capacity;
 
-	if (idx > capacity)
+	if (idx < 0 || idx >= capacity)
 		return -1;
 	if (capacity <= 0)
 		return -2;
@@ -38,7 +38,7 @@ int mmag_expand(int size)
 	int new_capacity = add_capacity * sizeof(MemorySlot);
 
 	void *tmp = realloc(ppc_runtime.slots, new_capacity);
-	if (!tmp) {
+	if (unlikely(!tmp)) {
 		console_errno();
 		return -1;
 	}
@@ -61,15 +61,10 @@ int mmag_write(int idx, uint8_t c)
 	}
 
 	if (bounds < 0) {
-		int need = idx - ppc_runtime.slots_capacity;
-
-		if (mmag_expand(need) != -1) {
-			mmag_write(idx, c);
-			return 0;
+		if (mmag_expand(idx) == -1) {
+			console_err("Invalid write %d", idx);
+			return -1;
 		}
-
-		console_err("Invalid write %d", idx);
-		return -1;
 	}
 
 	ppc_runtime.slots[idx].data = c;

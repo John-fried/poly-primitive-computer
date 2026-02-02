@@ -27,7 +27,7 @@ fi
 
 # Define test cases (multi-line strings)
 # Each variable is a separate session ending with EOF (Ctrl+D)
-TEST_1="10 EXP 10\n20 PUT 65 1\n30 PUT 66 2\n40 PUT 67 3\n50 PUT 68 4\n60 PUT 69 5\n70 PRINT 1..5\nRUN"
+TEST_1="10 mov 0, 72\n20 mov 1, 101\n30 mov 2, 108\n40 mov 3, 108\n50 mov 4, 111\n60 mov 5, 33\n70 print 1..5\nrun"
 
 #Reset log
 : > $LOG_FILE
@@ -76,6 +76,6 @@ echo_phases "1" "Program-test"
 
 # Loop through test cases
 run_valgrind "No input; fast exit" ""
-run_valgrind "Simple Program" "$TEST_1"
+run_valgrind "Printing \"Hello!\" test" "$TEST_1"
 
 log "all tests passed with status $STATUS"
