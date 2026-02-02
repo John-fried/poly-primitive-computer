@@ -9,14 +9,10 @@
 
 MKINSTR(print)
 {
-	if (ctx->argc == 1) {
-		putchar(mmag_get(ctx->runtime->pointer));
-		putchar('\n');
-		return NULL;
-	}
+	if (ctx->argc == 1) return NULL;
 
 	for (int i = 1; i < ctx->argc; i++) {
-		// find string ".." in ctx->argv[0]
+		/* find range between n1..n2 */
 		if (strstr(ctx->argv[i], "..")) {
 			int min, max;
 

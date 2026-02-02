@@ -61,7 +61,14 @@ int mmag_write(int idx, uint8_t c)
 	}
 
 	if (bounds < 0) {
-		console_err("Invalid write to %d", idx);
+		int need = idx - ppc_runtime.slots_capacity;
+
+		if (mmag_expand(need) != -1) {
+			mmag_write(idx, c);
+			return 0;
+		}
+
+		console_err("Invalid write %d", idx);
 		return -1;
 	}
 

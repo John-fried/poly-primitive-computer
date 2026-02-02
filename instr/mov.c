@@ -4,7 +4,6 @@
 #include "instr.def.h"
 
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -20,9 +19,6 @@ MKINSTR(mov)
 		*dest = (likely(src == NULL)) ? src_atoi : *src;
 		return NULL;
 	}
-
-	// *dest = atoi(ctx->argv[1]); --> *dest not point to anywhere else, this will cause segfault
-	// mmag_write(*dest, src_atoi);
 
 	mmag_write(atoi(ctx->argv[1]), src_atoi);
 	return NULL;

@@ -21,7 +21,6 @@ MKINSTR(run);
 MKINSTR(list);
 MKINSTR(home);
 MKINSTR(mov);
-MKINSTR(exp);
 MKINSTR(print);
 MKINSTR(trans);
 
@@ -30,7 +29,6 @@ struct PPC_Instr instr_list[] = {
 	MKINSTR_L(list),
 	MKINSTR_L(home),
 	MKINSTR_L(mov),
-	MKINSTR_L(exp),
 	MKINSTR_L(print),
 	MKINSTR_L(trans),
 };
