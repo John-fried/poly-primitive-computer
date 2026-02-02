@@ -10,7 +10,7 @@
 
 MKINSTR(list)
 {
-	int i;
+	uint32_t i;
 
 	for (i = 0; i <= ctx->runtime->code.max_line; i++) {
 		if (!ctx->runtime->code.code[i]) continue;

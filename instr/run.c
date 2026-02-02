@@ -14,7 +14,7 @@ MKINSTR(run)
 	struct PPC_Ctx run_ctx;
 	char *code;
 
-	for (int i = 0; i <= ctx->runtime->code.max_line; i++) {
+	for (uint32_t i = 0; i <= ctx->runtime->code.max_line; i++) {
 			if (!ctx->runtime->code.code[i]) continue;
 
 			code = strdup(ctx->runtime->code.code[i]);

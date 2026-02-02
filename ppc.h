@@ -21,15 +21,15 @@ typedef struct {
 
 struct PPC_Code {
 	char **			code;
-	uint16_t 		max_line;
-	uint16_t 		size;
+	uint32_t 		max_line;
+	uint32_t 		size;
 };
 
 struct PPC_Runtime {
 	uint8_t			gpr[3];	/* general purpose register */
-	uint16_t 		pointer;
+	uint32_t 		pointer;
 	MemorySlot *		slots;
-	uint16_t 		slots_capacity;
+	uint32_t 		slots_capacity;
 
 	struct 			PPC_Code code;
 	RunMode 		mode;
