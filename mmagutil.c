@@ -6,17 +6,20 @@
 #include <string.h>
 #include <errno.h>
 
-/* _out_bounds_check - throw -1 if the input idx was so big
- *(0 or lower capacity will return -3)
+/* out_bounds_check(idx)- to check if an idx is out-of-bounds
+ * return -1 if idx > bounds
+ * (0 or lower capacity (invalid capacity size) will return -2)
  * nothing conditional was satisfied will return its current capacity
  */
-static int _out_bounds_check(int idx)
+int out_bounds_check(int idx)
 {
 	int capacity = ppc_runtime.slots_capacity;
+
 	if (idx > capacity)
 		return -1;
 	if (capacity <= 0)
-		return -3;
+		return -2;
+
 	return capacity;
 }
 
@@ -48,11 +51,11 @@ int mmag_expand(int size)
 /* mmag_write(idx, c) - write c into memory idx
  * return -1 if fail, otherwise 0
  */
-int mmag_write(int idx, int c)
+int mmag_write(int idx, uint8_t c)
 {
-	int bounds = _out_bounds_check(idx);
+	int bounds = out_bounds_check(idx);
 
-	if (bounds <= -3) {
+	if (bounds <= -2) {
 		console_err("Invalid size %d", ppc_runtime.slots_capacity);
 		return -1;
 	}
@@ -69,9 +72,9 @@ int mmag_write(int idx, int c)
 /* mmag_get(idx) - get and return value of memory idx */
 int mmag_get(int idx)
 {
-	int bounds = _out_bounds_check(idx);
+	int bounds = out_bounds_check(idx);
 
-	if (bounds <= -3) {
+	if (bounds <= -2) {
 		console_err("Invalid size %d", ppc_runtime.slots_capacity);
 		return -1;
 	}

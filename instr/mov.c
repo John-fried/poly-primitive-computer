@@ -4,25 +4,26 @@
 #include "instr.def.h"
 
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 MKINSTR(mov)
 {
-	int *reg;
-
 	if (ctx->argc == 1) return (void *)(intptr_t)1;
 
-	int src = atoi(ctx->argv[2]);
+	int *dest;
+	int *src = ppc_get_register(ctx->argv[2]);
+	int src_atoi = atoi(ctx->argv[2]);
 
-	if ((reg = ppc_get_register(ctx->argv[1])) != NULL) {
-		*reg = src;
+	if ((dest = ppc_get_register(ctx->argv[1])) != NULL) {
+		*dest = (likely(src == NULL)) ? src_atoi : *src;
 		return NULL;
 	}
 
-	int dest = (ctx->argc > 2) ? atoi(ctx->argv[2]) : 0;
+	// *dest = atoi(ctx->argv[1]); --> *dest not point to anywhere else, this will cause segfault
+	// mmag_write(*dest, src_atoi);
 
-	mmag_write(dest, ctx->runtime->slots[src].data);
-	ctx->runtime->slots[src].data = 0;
+	mmag_write(atoi(ctx->argv[1]), src_atoi);
 	return NULL;
 }

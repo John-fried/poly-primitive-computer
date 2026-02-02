@@ -26,6 +26,7 @@ struct PPC_Code {
 };
 
 struct PPC_Runtime {
+	uint8_t			gpr[3];	/* general purpose register */
 	uint16_t 		pointer;
 	MemorySlot *		slots;
 	uint16_t 		slots_capacity;
