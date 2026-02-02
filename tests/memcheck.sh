@@ -27,7 +27,7 @@ fi
 
 # Define test cases (multi-line strings)
 # Each variable is a separate session ending with EOF (Ctrl+D)
-TEST_1="10 mov 0, 72\n20 mov 1, 101\n30 mov 2, 108\n40 mov 3, 108\n50 mov 4, 111\n60 mov 5, 33\n70 print 1..5\nrun"
+TEST_1="10 mov 0, 72\n20 mov 1, 101\n30 mov 2, 108\n40 mov 3, 108\n50 mov 4, 111\n60 mov 5, 33\n70 print 0..5\nrun"
 
 #Reset log
 : > $LOG_FILE
