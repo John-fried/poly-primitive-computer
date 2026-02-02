@@ -1,5 +1,6 @@
 #include "parser.h"
 #include "ppc.h"
+#include "eval.h"
 #include "instr.def.h"
 
 #include <stdint.h>

@@ -4,6 +4,7 @@
 #include "color.h"
 #include "console.h"
 #include "instr.def.h"
+#include "register.def.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -31,7 +32,7 @@ void free_ctx(struct PPC_Ctx *ctx)
 		free(ctx->full_string);
 }
 
-void init(void)
+void ppc_init(void)
 {
 	ppc_runtime.pointer = 0;
 	ppc_runtime.slots_capacity = 1;
@@ -55,7 +56,7 @@ void free_array(char **arr, size_t n)
 	free(arr);
 }
 
-void interpreter_loop(void)
+void ppc_loop(void)
 {
 	char line[LINESIZE];
 
@@ -72,7 +73,7 @@ void interpreter_loop(void)
 	}
 }
 
-void interpreter_exit(void)
+void ppc_exit(void)
 {
 	putchar('\n');
 	free(ppc_runtime.slots);
@@ -80,10 +81,12 @@ void interpreter_exit(void)
 	free_array(ppc_runtime.code.code, ppc_runtime.code.max_line);
 }
 
-int main()
+void *ppc_get_register(char *alias)
 {
-	init();
-	interpreter_loop();
-	interpreter_exit();
-	return 0;
+	for (int i = 0; i < REG_COUNT; i++) {
+		if (likely(strcmp(ppc_registers[i].alias, alias) == 0))
+			return ppc_registers[i].setter;
+	}
+
+	return NULL;
 }

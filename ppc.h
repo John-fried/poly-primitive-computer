@@ -42,9 +42,15 @@ struct PPC_Ctx {
 	struct PPC_Runtime *	runtime;
 };
 
-extern struct PPC_Runtime ppc_runtime; // global runtime context
-extern struct PPC_Ctx ppc_context; // global context
+struct PPC_Reg {
+	char			alias[16];
+	void *			setter;
+};
 
+/* Global struct */
+extern struct PPC_Runtime ppc_runtime;
+extern struct PPC_Ctx ppc_context;
+extern struct PPC_Reg ppc_registers[];
 
 /* utility to initialize an empty PPC_Ctx struct,
  * prevent from garbage data from a uininitialized struct
@@ -54,7 +60,10 @@ void init_ctx(struct PPC_Ctx *ctx);
 /* Utility to free context, avoiding the memory leak */
 void free_ctx(struct PPC_Ctx *ctx);
 
-/* Utility to execute instruction from context */
-void interpret(struct PPC_Ctx *ctx);
+void ppc_init(void);
+void ppc_loop(void);
+void ppc_exit(void);
+
+void *ppc_get_register(char *alias);
 
 #endif /* PPC_H */
