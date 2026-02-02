@@ -2,11 +2,14 @@
 #include "ppc.h"
 #include "instr.def.h"
 
+#include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 
-MKINSTR(RUN)
+MKINSTR(run)
 {
+	if (ppc_runtime.mode == MODE_CODE) return (void *)(intptr_t)1;
+
 	struct PPC_Ctx run_ctx;
 	char *code;
 
@@ -30,4 +33,6 @@ MKINSTR(RUN)
 			free_ctx(&run_ctx);
 			free(code);
 	}
+
+	return NULL;
 }

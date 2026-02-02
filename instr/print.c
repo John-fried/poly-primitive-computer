@@ -7,12 +7,12 @@
 #include <stdio.h>
 #include <string.h>
 
-MKINSTR(PRINT)
+MKINSTR(print)
 {
 	if (ctx->argc == 1) {
 		putchar(mmag_get(ctx->runtime->pointer));
 		putchar('\n');
-		return;
+		return NULL;
 	}
 
 	for (int i = 1; i < ctx->argc; i++) {
@@ -30,4 +30,5 @@ MKINSTR(PRINT)
 
 
 	putchar('\n');
+	return NULL;
 }

@@ -4,12 +4,15 @@
 #include "instr.def.h"
 #include "color.h"
 
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
-MKINSTR(LIST)
+MKINSTR(list)
 {
-	for (int i = 0; i <= ctx->runtime->code.max_line; i++) {
+	int i;
+
+	for (i = 0; i <= ctx->runtime->code.max_line; i++) {
 		if (!ctx->runtime->code.code[i]) continue;
 		char *code = ctx->runtime->code.code[i];
 
@@ -17,4 +20,6 @@ MKINSTR(LIST)
 
 		printf("  %-5d %s\n", i, code);
 	}
+
+	return (void *)(intptr_t)i;
 }

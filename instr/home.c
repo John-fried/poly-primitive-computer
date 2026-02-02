@@ -3,9 +3,10 @@
 
 #include <stdio.h>
 
-MKINSTR(HOME)
+MKINSTR(home)
 {
 	(void) ctx;
-	printf("\033[H\033[2J");
+	printf("\033[H\033[2J\033[3J");
+	return NULL;
 }
 

@@ -1,9 +1,12 @@
 #ifndef PPC_H
 #define PPC_H
 
-#define LINESIZE 256
-#define ARGSSIZE 64
-#define INITIAL_CODESIZE 8 // initial codeline size "8 ..."
+#define LINESIZE 		256
+#define ARGSSIZE 		64
+#define INITIAL_CODESIZE 	8
+
+#define likely(x)     		__builtin_expect(!!(x), 1)
+#define unlikely(x)    		__builtin_expect(!!(x), 0)
 
 typedef enum {
 	MODE_DIRECT,
@@ -11,31 +14,30 @@ typedef enum {
 } RunMode;
 
 typedef struct {
-	int data;
+	int 			data;
 } MemorySlot;
 
 struct PPC_Code {
-	char **code;
-	int max_line;
-	int size; // size of codeline, (used if maxline > size realloc)
+	char **			code;
+	int 			max_line;
+	int 			size;
 };
 
 struct PPC_Runtime {
-	int pointer; // the current pointer index
-	MemorySlot *slots;
-	int slots_capacity;
+	int 			pointer;
+	MemorySlot *		slots;
+	int 			slots_capacity;
 
-	/* code - "10 ...", stores the code */
-	struct PPC_Code code;
-	RunMode mode; //running mode
+	struct 			PPC_Code code;
+	RunMode 		mode;
 };
 
 struct PPC_Ctx {
-	int line;
-	int argc;
-	char *argv[ARGSSIZE];
-	char *full_string;
-	struct PPC_Runtime *runtime;
+	int 			line;
+	int 			argc;
+	char *			argv[ARGSSIZE];
+	char *			full_string;
+	struct PPC_Runtime *	runtime;
 };
 
 extern struct PPC_Runtime ppc_runtime; // global runtime context

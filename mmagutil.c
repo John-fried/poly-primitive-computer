@@ -52,12 +52,14 @@ int mmag_write(int idx, int c)
 	int bounds = _out_bounds_check(idx);
 
 	if (bounds <= -3) {
-		console_err("invalid memory size. at size %d", ppc_runtime.slots_capacity);
+		console_err("Invalid size %d", ppc_runtime.slots_capacity);
 		return -1;
 	}
 
-	if (bounds < 0)
-		console_warn("Out-of-bounds write");
+	if (bounds < 0) {
+		console_err("Invalid write to %d", idx);
+		return -1;
+	}
 
 	ppc_runtime.slots[idx].data = c;
 	return 0;

@@ -48,7 +48,7 @@ void find_range(const char *str, int *min, int *max)
                 int str_len = strlen(str);
                 int result_len = strlen(result);
                 char *strtemp = strdup(str);
-                strtemp[str_len - (result_len)] = 0; // n1\0.n2
+                strtemp[str_len - (result_len)] = 0; /* "n1\0.n2" */
 
                 int n1 = atoi(strtemp);
                 free(strtemp);
@@ -66,7 +66,7 @@ void find_range(const char *str, int *min, int *max)
                 return;
         }
 
-        // default to 1
+        /* default value */
         *min = 0;
         *max = 1;
 }
@@ -74,7 +74,7 @@ void find_range(const char *str, int *min, int *max)
 int hasdigit(const char *str)
 {
         while (*str)
-                if (!isdigit(*str++)) return -1;
+                if (!isdigit(*str++)) return 0;
 
-        return 0;
+        return 1;
 }
