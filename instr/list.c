@@ -16,7 +16,7 @@ MKINSTR(list)
 		if (!ctx->runtime->code.code[i]) continue;
 		char *code = ctx->runtime->code.code[i];
 
-		if (unlikely(strlen(code) <= 1)) continue;
+		if (strlen(code) < 1) continue;
 
 		printf("%d %s\n", i, code);
 	}

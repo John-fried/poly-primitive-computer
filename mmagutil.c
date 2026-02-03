@@ -82,7 +82,7 @@ int mmag_get(int idx)
 	}
 
 	if (bounds < 0) {
-		console_err("Invalid read to %d", idx);
+		console_err("Invalid read %d", idx);
 		return -1;
 	}
 

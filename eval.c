@@ -41,7 +41,7 @@ int realloc_codesize(void)
 void interpret(struct PPC_Ctx *ctx)
 {
 	if (ctx->runtime->mode == MODE_DIRECT) {
-		if (likely(hasdigit(ctx->argv[0]))) {
+		if (hasdigit(ctx->argv[0])) {
 			int old_line = ctx->runtime->code.max_line;
 			int line = atoi(ctx->argv[0]);
 			char code[LINESIZE];
@@ -76,7 +76,7 @@ void interpret(struct PPC_Ctx *ctx)
 	}
 
 	for (int i = 0; i < INST_COUNT; i++) {
-		if (likely(strcmp(instr_list[i].name, ctx->argv[0]) == 0)) {
+		if (strcmp(instr_list[i].name, ctx->argv[0]) == 0) {
 			char *line = strdup(ctx->full_string);
 			line = remove_comment(line);
 			parse_line(line, ctx);

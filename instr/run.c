@@ -20,7 +20,7 @@ MKINSTR(run)
 
 			code = strdup(ctx->runtime->code.code[i]);
 
-			if (unlikely(strlen(code) <= 1)) {
+			if (strlen(code) <= 1) {
 				free(code);
 				continue;
 			}

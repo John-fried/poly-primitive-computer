@@ -1,3 +1,5 @@
+/* mov - the best instruction ever to interact with data */
+
 #include "ppc.h"
 #include "error.h"
 #include "mmagutil.h"

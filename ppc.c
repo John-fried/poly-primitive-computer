@@ -84,7 +84,7 @@ void ppc_exit(void)
 void *ppc_get_register(char *alias)
 {
 	for (int i = 0; i < REG_COUNT; i++) {
-		if (likely(strcmp(ppc_registers[i].alias, alias) == 0))
+		if (strcmp(ppc_registers[i].alias, alias) == 0)
 			return ppc_registers[i].setter;
 	}
 
