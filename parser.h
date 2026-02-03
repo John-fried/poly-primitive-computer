@@ -3,7 +3,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#define PARSER_TOK_DELIM " \n\t\r"
+#define PARSER_TOK_DELIM " ,\n\t\r"
 #define PARSER_TOK_COMMENT ";"
 
 #include "ppc.h"

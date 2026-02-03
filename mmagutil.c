@@ -44,7 +44,7 @@ int mmag_expand(int size)
 	}
 
 	ppc_runtime.slots = tmp;
-	ppc_runtime.slots_capacity = new_capacity;
+	ppc_runtime.slots_capacity = add_capacity;
 	return new_capacity;
 }
 
