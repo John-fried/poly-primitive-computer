@@ -5,6 +5,17 @@
 #include <ctype.h>
 #include <string.h>
 
+void merge_array(char **arr, int n, char *buf)
+{
+        char *ptr = buf;
+
+        for (int i = 0; i < n; i++) {
+                strcpy(ptr, arr[i]);
+                ptr += strlen(ptr);
+                if (i < n - 1) strcpy(ptr++, " ");
+        }
+}
+
 static void _readtoken(char *line, struct PPC_Ctx *ctx)
 {
         int i = 0;

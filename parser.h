@@ -8,6 +8,11 @@
 
 #include "ppc.h"
 
+/* merge_array(arr, n, buf) - utility to merge an array with size n
+ * into string buf
+ */
+void merge_array(char **arr, int n, char *buf);
+
 /* remove_comment(line) - remove a comment token from a string,
  * return the final string
  */

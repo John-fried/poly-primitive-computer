@@ -15,7 +15,6 @@
 /* Utility to realloc code without deleting the data*/
 int realloc_codesize(void)
 {
-	//dont realloc if its was still smaller/lower
 	if (ppc_runtime.code.max_line < ppc_runtime.code.size) return 0;
 
 	int old_line = ppc_runtime.code.size;
@@ -24,7 +23,7 @@ int realloc_codesize(void)
 
 	void *tmp = realloc(ppc_runtime.code.code, new_byte_size);
 
-	if (!tmp) {
+	if (unlikely(!tmp)) {
 		console_errno();
 		return -1;
 	}
@@ -38,39 +37,38 @@ int realloc_codesize(void)
 	return 0;
 }
 
+int insert_code(int line, char *code)
+{
+	int old_line = ppc_runtime.code.max_line;
+
+	if (line > old_line)
+		ppc_runtime.code.max_line = line;
+
+	if (realloc_codesize() < 0) {
+		ppc_runtime.code.max_line = old_line;
+		return -1;
+	}
+
+	if (ppc_runtime.code.code[line] != NULL)
+		free(ppc_runtime.code.code[line]);
+
+	ppc_runtime.code.code[line] = strdup(code);
+	return 0;
+}
+
 void interpret(struct PPC_Ctx *ctx)
 {
 	if (ctx->runtime->mode == MODE_DIRECT) {
 		if (hasdigit(ctx->argv[0])) {
-			int old_line = ctx->runtime->code.max_line;
 			int line = atoi(ctx->argv[0]);
 			char code[LINESIZE];
-			char *ptr = code;
-			struct PPC_Code *code_ctx = &ctx->runtime->code;
 
-			if (old_line < line)
-				code_ctx->max_line = line;
-
-			/* clear code & realloc */
 			memset(code, 0, sizeof(code));
-			if (realloc_codesize() < 0) {
-				code_ctx->max_line = old_line;
-				return;
-			}
-
 			if (ctx->argc > 1) {
-				for (int i = 1; i < ctx->argc; i++) {
-					strcpy(ptr, ctx->argv[i]);
-					ptr += strlen(ctx->argv[i]);
-					if (i < ctx->argc - 1) strcpy(ptr++, " ");
-				}
-
+				merge_array(ctx->argv + 1, ctx->argc - 1, code);
 			}
 
-			/* cleanup if any & fill */
-			if (code_ctx->code[line] != NULL)
-				free(code_ctx->code[line]);
-			ctx->runtime->code.code[line] = strdup(code);
+			insert_code(line, code);
 			return;
 		}
 	}
