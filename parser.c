@@ -16,7 +16,7 @@ void merge_array(char **arr, int n, char *buf)
         }
 }
 
-static void _readtoken(char *line, struct PPC_Ctx *ctx)
+void slice_string(char *line, struct PPC_Ctx *ctx)
 {
         int i = 0;
         ctx->argc = 0;
@@ -48,7 +48,16 @@ void parse_line(char *line, struct PPC_Ctx *ctx)
         }
 
         ctx->full_string = strdup(line);
-        _readtoken(line, ctx);
+        slice_string(line, ctx);
+}
+
+void preprocess_line(char *line, struct PPC_Ctx *ctx)
+{
+        /* preprocessing */
+        line = remove_comment(line);
+
+        /* final parse */
+        parse_line(line, ctx);
 }
 
 void find_range(const char *str, int *min, int *max)

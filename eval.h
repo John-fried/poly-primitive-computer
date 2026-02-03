@@ -4,6 +4,8 @@
 #include "ppc.h"
 
 int realloc_codesize(void);
-void interpret(struct PPC_Ctx *ctx);
+
+/* the core of the program to evaluate instruction */
+void eval(struct PPC_Ctx *ctx);
 
 #endif /* EVAL_H */

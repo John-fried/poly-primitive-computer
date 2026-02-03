@@ -69,7 +69,7 @@ void ppc_loop(void)
 
 		ppc_context.runtime->mode = MODE_DIRECT;
 		parse_line(line, &ppc_context);
-		interpret(&ppc_context);
+		eval(&ppc_context);
 	}
 }
 

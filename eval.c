@@ -56,7 +56,7 @@ int insert_code(int line, char *code)
 	return 0;
 }
 
-void interpret(struct PPC_Ctx *ctx)
+void eval(struct PPC_Ctx *ctx)
 {
 	if (ctx->runtime->mode == MODE_DIRECT) {
 		if (hasdigit(ctx->argv[0])) {
@@ -76,9 +76,7 @@ void interpret(struct PPC_Ctx *ctx)
 	for (int i = 0; i < INST_COUNT; i++) {
 		if (strcmp(instr_list[i].name, ctx->argv[0]) == 0) {
 			char *line = strdup(ctx->full_string);
-			line = remove_comment(line);
-			parse_line(line, ctx);
-
+			preprocess_line(line, ctx);
 			instr_list[i].handler(ctx);
 			free(line);
 			return;

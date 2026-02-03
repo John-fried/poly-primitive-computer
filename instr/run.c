@@ -29,7 +29,7 @@ MKINSTR(run)
 			ppc_context.line = i;
 
 			parse_line(code, &run_ctx);
-			interpret(&run_ctx);
+			eval(&run_ctx);
 
 			free(code);
 	}

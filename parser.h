@@ -13,15 +13,26 @@
  */
 void merge_array(char **arr, int n, char *buf);
 
+/* slice_string(line, ctx) - utility to slice string line into
+ * ctx->argv and ctx->argc counter
+ */
+void slice_string(char *line, struct PPC_Ctx *ctx);
+
 /* remove_comment(line) - remove a comment token from a string,
  * return the final string
  */
 char *remove_comment(char *line);
 
 /* parse_line(line, ctx) - Utility to parse line and store parsed
- * context into ctx
+ * context into ctx, (warning: not preprocessing, just simple parse
+ * and then store to context)
  */
 void parse_line(char *line, struct PPC_Ctx *ctx);
+
+/* preprocess_line(line) - utility to preprocess line before evaluated
+ * also store to context
+ */
+void preprocess_line(char *line, struct PPC_Ctx *ctx);
 
 /* find_range(str, *min, *max) - utility to find range between
  * integrer N1..N2, and stores min/max integrer into min
