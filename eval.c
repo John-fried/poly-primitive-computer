@@ -64,9 +64,12 @@ PPC_Value eval(struct PPC_Ctx *ctx)
 			int line = atoi(ctx->argv[0]);
 			char code[LINESIZE];
 
-			memset(code, 0, sizeof(code));
-			if (ctx->argc > 1) {
-				merge_array(ctx->argv + 1, ctx->argc - 1, code);
+			/* copy code with length of (argv[0] + 2) OR (argv[0] + 1 + 1)
+			 * (for space: "10 " and for newline in the end) */
+			int len = strlen(ctx->full_string) - (strlen(ctx->argv[0]) + 2);
+			if (len > 0) {
+			    memcpy(code, ctx->full_string + (strlen(ctx->argv[0]) + 1), len);
+			    code[len] = '\0';
 			}
 
 			insert_code(line, code);
@@ -82,7 +85,6 @@ PPC_Value eval(struct PPC_Ctx *ctx)
 			PPC_Value ret;
 
 			ret = instr_list[i].handler(ctx);
-
 			free(line);
 			return ret;
 		}

@@ -7,18 +7,6 @@
 #include <ctype.h>
 #include <string.h>
 
-void merge_array(char **arr, int n, char *buf)
-{
-	char *ptr = buf;
-
-	for (int i = 0; i < n; i++) {
-		memcpy(ptr, arr[i], strlen(arr[i]));
-		ptr += strlen(ptr);
-		if (i < n - 1)
-			memcpy(ptr++, " ", 1);
-	}
-}
-
 void slice_string(char *line, struct PPC_Ctx *ctx)
 {
 	int i = 0;

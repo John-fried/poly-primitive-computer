@@ -10,11 +10,6 @@
 
 #include "ppc.h"
 
-/* merge_array(arr, n, buf) - utility to merge an array with size n
- * into string buf
- */
-void merge_array(char **arr, int n, char *buf);
-
 /* slice_string(line, ctx) - utility to slice string line into
  * ctx->argv and ctx->argc counter
  */
