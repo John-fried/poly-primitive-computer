@@ -12,9 +12,9 @@ void merge_array(char **arr, int n, char *buf)
         char *ptr = buf;
 
         for (int i = 0; i < n; i++) {
-                strcpy(ptr, arr[i]);
+                memcpy(ptr, arr[i], strlen(arr[i]));
                 ptr += strlen(ptr);
-                if (i < n - 1) strcpy(ptr++, " ");
+                if (i < n - 1) memcpy(ptr++, " ", 1);
         }
 }
 
@@ -146,7 +146,7 @@ STATIC void process_subevaluate(char *line)
                 PPC_Value res = eval(&sub_ctx);
 
                 /* handle result value */
-		char res_buffer[32];
+                char res_buffer[32];
                 char *final_replacement;
 
                 if (res.type == VAL_INTEGRER) {

@@ -2,7 +2,8 @@
 #define PPC_H
 
 #define LINESIZE 		256
-#define ARGSSIZE 		64
+#define ARGSSIZE 		32
+#define INITIAL_SLOTSIZE 	8
 #define INITIAL_CODESIZE 	8
 
 #define likely(x)     		__builtin_expect(!!(x), 1)
