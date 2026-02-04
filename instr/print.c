@@ -1,6 +1,6 @@
 #include "ppc.h"
 #include "parser.h"
-#include "mmagutil.h"
+#include "memory.h"
 #include "instr.def.h"
 
 #include <stdlib.h>
@@ -19,10 +19,10 @@ MKINSTR(print)
 
 			find_range(ctx->argv[i], &min, &max);
 			for (int j = min; j <= max; j++) {
-				IFNPIPE putchar(mmag_get(j));
+				IFNPIPE putchar(mem_get(j));
 			}
 		} else
-			IFNPIPE putchar(mmag_get(atoi(ctx->argv[i])));
+			IFNPIPE putchar(mem_get(atoi(ctx->argv[i])));
 	}
 
 	putchar('\n');

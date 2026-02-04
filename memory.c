@@ -1,4 +1,4 @@
-/* mmagutil.c - Memory management utility for PPC */
+/* memory.c - Memory management utility for PPC */
 #include "ppc.h"
 #include "console.h"
 
@@ -23,10 +23,10 @@ int out_bounds_check(int idx)
 	return capacity;
 }
 
-/* mmag_expand(size) - expand memory capacity with size
+/* mem_expand(size) - expand memory capacity with size
  * return the number of capacity written, or -1 if error
  */
-int mmag_expand(int size)
+int mem_expand(int size)
 {
 	if (size < 1) {
 		console_err("Invalid size %d", size);
@@ -48,10 +48,10 @@ int mmag_expand(int size)
 	return new_capacity;
 }
 
-/* mmag_write(idx, c) - write c into memory idx
+/* mem_write(idx, c) - write c into memory idx
  * return -1 if fail, otherwise 0
  */
-int mmag_write(int idx, uint8_t c)
+int mem_write(int idx, uint8_t c)
 {
 	int bounds = out_bounds_check(idx);
 
@@ -61,7 +61,7 @@ int mmag_write(int idx, uint8_t c)
 	}
 
 	if (bounds < 0) {
-		if (mmag_expand(idx) == -1) {
+		if (mem_expand(idx) == -1) {
 			console_err("Invalid write %d", idx);
 			return -1;
 		}
@@ -71,8 +71,8 @@ int mmag_write(int idx, uint8_t c)
 	return 0;
 }
 
-/* mmag_get(idx) - get and return value of memory idx */
-int mmag_get(int idx)
+/* mem_get(idx) - get and return value of memory idx */
+int mem_get(int idx)
 {
 	int bounds = out_bounds_check(idx);
 

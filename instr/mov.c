@@ -2,7 +2,7 @@
 
 #include "ppc.h"
 #include "error.h"
-#include "mmagutil.h"
+#include "memory.h"
 #include "instr.def.h"
 
 #include <stdint.h>
@@ -23,6 +23,6 @@ MKINSTR(mov)
 		return VAL_SUCCESS;
 	}
 
-	mmag_write(atoi(ctx->argv[1]), src);
+	mem_write(atoi(ctx->argv[1]), src);
 	return VAL_SUCCESS;
 }
