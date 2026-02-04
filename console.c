@@ -7,7 +7,7 @@
 #include <string.h>
 #include <errno.h>
 
-static void _console_diag(const char *prefix, const char *fmt, va_list ap, int line)
+STATIC void _console_diag(const char *prefix, const char *fmt, va_list ap, int line)
 {
 	fprintf(stderr, "%s:", prefix);
 	if (line >= 0 && ppc_runtime.mode == MODE_CODE)

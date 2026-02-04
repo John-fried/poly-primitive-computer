@@ -8,6 +8,6 @@ MKINSTR(home)
 	(void) ctx;
 	printf("\033[H\033[2J\033[3J");
 	fflush(stdout);
-	return NULL;
+	return VAL_SUCCESS;
 }
 

@@ -56,7 +56,7 @@ int insert_code(int line, char *code)
 	return 0;
 }
 
-void eval(struct PPC_Ctx *ctx)
+PPC_Value eval(struct PPC_Ctx *ctx)
 {
 	if (ctx->runtime->mode == MODE_DIRECT) {
 		if (hasdigit(ctx->argv[0])) {
@@ -69,20 +69,27 @@ void eval(struct PPC_Ctx *ctx)
 			}
 
 			insert_code(line, code);
-			return;
+			return VAL_SUCCESS;
 		}
 	}
 
+	char *line = strdup(ctx->full_string);
+	preprocess_line(line, ctx);
+
 	for (int i = 0; i < INST_COUNT; i++) {
 		if (strcmp(instr_list[i].name, ctx->argv[0]) == 0) {
-			char *line = strdup(ctx->full_string);
-			preprocess_line(line, ctx);
-			instr_list[i].handler(ctx);
+			PPC_Value ret;
+
+			ret = instr_list[i].handler(ctx);
+
 			free(line);
-			return;
+			return ret;
 		}
 	}
 
 	console_err("%s not found", ctx->argv[0]);
+
+	free(line);
+	return VAL_ERROR;
 }
 

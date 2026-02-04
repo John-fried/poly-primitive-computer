@@ -1,4 +1,6 @@
+#include "ppc.h"
 #include "parser.h"
+#include "eval.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,15 +53,6 @@ void parse_line(char *line, struct PPC_Ctx *ctx)
         slice_string(line, ctx);
 }
 
-void preprocess_line(char *line, struct PPC_Ctx *ctx)
-{
-        /* preprocessing */
-        line = remove_comment(line);
-
-        /* final parse */
-        parse_line(line, ctx);
-}
-
 void find_range(const char *str, int *min, int *max)
 {
         char *result;
@@ -97,4 +90,84 @@ int hasdigit(const char *str)
                 if (!isdigit(*str++)) return 0;
 
         return 1;
+}
+
+/* Preprocessing input handler logic*/
+
+
+/* stitch_string - utility to stitch orig string from open/close tag into replacement
+ * example:
+ *      tag: "[", "]"
+ *      orig: "mov 0, [trans A]",
+ *      replacement: "65",
+ *      final: "mov 0, 65"
+ */
+STATIC char *stitch_string(char *orig, const char *open_tag,
+                           const char *close_tag, const char *replacement) {
+	int prefix_len = open_tag - orig;
+	int middle_len = strlen(replacement);
+	int suffix_len = strlen(close_tag + 1);
+
+	char *new_string = malloc(prefix_len + middle_len + suffix_len + 1);
+	if (!new_string) return orig;
+
+	/* stitching process */
+	memcpy(new_string, orig, prefix_len);	/* prefix (example 'mov 0, ')
+						 * memcpy take len as a character count,
+						 * not index, so it will only take to 'mov 0, ' (7 characters),
+						 * not 'mov 0, [' (7 index)
+						 */
+	memcpy(new_string + prefix_len, replacement, middle_len); /* replacement */
+	memcpy(new_string + prefix_len + middle_len, close_tag + 1, suffix_len); /* after close tag */
+
+	return new_string;
+}
+
+
+/* process_subevaluate(line) - utility to process subevaluate instruction
+ * from a string line, and return the final result
+ */
+STATIC void process_subevaluate(char *line)
+{
+        char *open, *close;
+
+        while ((open = strstr(line, PARSER_TOK_SUBEVAL_OPEN)) &&
+                (close = strstr(open, PARSER_TOK_SUBEVAL_CLOSE))) {
+                size_t inner_len = close - (open + 1);
+                char *inner_cmd = strndup(open + 1, inner_len);
+
+                /* initialize context & evaluate */
+                struct PPC_Ctx sub_ctx;
+                init_ctx(&sub_ctx);
+                parse_line(inner_cmd, &sub_ctx);
+                PPC_Value res = eval(&sub_ctx);
+
+                /* handle result value */
+		char res_buffer[32];
+                char *final_replacement;
+
+                if (res.type == VAL_INTEGRER) {
+                    sprintf(res_buffer, "%d", res.value);
+                    final_replacement = res_buffer;
+                } else
+                    final_replacement = res.string;
+
+        	/* slitch string - replace subeval to result */
+                char *temp_line = stitch_string(line, open, close, final_replacement);
+                strcpy(line, temp_line);
+
+                /* cleanup */
+                free(inner_cmd);
+                free(temp_line);
+        }
+}
+
+void preprocess_line(char *line, struct PPC_Ctx *ctx)
+{
+        /* preprocessing */
+        line = remove_comment(line);
+        process_subevaluate(line);
+
+        /* final parse */
+        parse_line(line, ctx);
 }

@@ -10,9 +10,9 @@
 
 MKINSTR(trans)
 {
-	if (ctx->argc == 1) return (void *)(intptr_t)1;
+	if (ctx->argc == 1) return VAL_ERROR;
 
 	int character = ctx->argv[1][0];
 	printf("%d\n", character);
-	return (void *)(intptr_t)character;
+	return VAL_INT(character);
 }

@@ -8,6 +8,8 @@
 #define likely(x)     		__builtin_expect(!!(x), 1)
 #define unlikely(x)    		__builtin_expect(!!(x), 0)
 
+#define STATIC 			static
+
 #include <stdint.h>
 
 typedef enum {
@@ -47,6 +49,22 @@ struct PPC_Reg {
 	char			alias[16];
 	void *			setter;
 };
+
+typedef enum {
+	VAL_STRING,
+	VAL_INTEGRER
+} ValueType;
+
+typedef struct PPC_Value {
+	ValueType		type;
+	char *			string;
+	int 			value;
+} PPC_Value;
+
+#define VAL_ERROR 		(PPC_Value){VAL_INTEGRER, "", 1}
+#define VAL_SUCCESS 		(PPC_Value){VAL_INTEGRER, "", 0}
+#define VAL_STR(x)		(PPC_Value){VAL_STRING, #x, 0}
+#define VAL_INT(x)		(PPC_Value){VAL_INTEGRER, "", x}
 
 /* Global struct */
 extern struct PPC_Runtime ppc_runtime;

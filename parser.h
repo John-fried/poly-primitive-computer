@@ -5,6 +5,8 @@
 
 #define PARSER_TOK_DELIM " ,\n\t\r"
 #define PARSER_TOK_COMMENT ";"
+#define PARSER_TOK_SUBEVAL_OPEN "["
+#define PARSER_TOK_SUBEVAL_CLOSE "]"
 
 #include "ppc.h"
 

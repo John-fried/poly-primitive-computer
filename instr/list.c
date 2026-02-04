@@ -21,5 +21,5 @@ MKINSTR(list)
 		printf("%d %s\n", i, code);
 	}
 
-	return (void *)(intptr_t)i;
+	return VAL_INT(i);
 }

@@ -6,6 +6,6 @@
 int realloc_codesize(void);
 
 /* the core of the program to evaluate instruction */
-void eval(struct PPC_Ctx *ctx);
+PPC_Value eval(struct PPC_Ctx *ctx);
 
 #endif /* EVAL_H */

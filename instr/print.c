@@ -9,7 +9,7 @@
 
 MKINSTR(print)
 {
-	if (ctx->argc == 1) return NULL;
+	if (ctx->argc == 1) return VAL_ERROR;
 
 	for (int i = 1; i < ctx->argc; i++) {
 		/* find range between n1..n2 */
@@ -26,5 +26,5 @@ MKINSTR(print)
 
 
 	putchar('\n');
-	return NULL;
+	return VAL_SUCCESS;
 }

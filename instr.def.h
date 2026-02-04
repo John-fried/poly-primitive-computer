@@ -3,14 +3,14 @@
 
 #include "ppc.h"
 
-typedef void *(*instruction_handler)(struct PPC_Ctx *context);
+typedef struct PPC_Value (*instruction_handler)(struct PPC_Ctx *context);
 
 struct PPC_Instr {
 	char name[64];
 	instruction_handler handler;
 };
 
-#define MKINSTR(name) void *name ## _handler(struct PPC_Ctx *ctx) // will be replaced as: void NAME_handler(...)
+#define MKINSTR(name) struct PPC_Value name ## _handler(struct PPC_Ctx *ctx) // will be replaced as: void NAME_handler(...)
 #define MKINSTR_L(name) {#name, name ## _handler}  // will be replaced as: {NAME, NAME_handler}
 
 // _MAKE_INSTR_USES_ - to avoid include issues in instr/*.c

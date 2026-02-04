@@ -9,7 +9,7 @@
 
 MKINSTR(run)
 {
-	if (ppc_runtime.mode == MODE_CODE) return (void *)(intptr_t)1;
+	if (ppc_runtime.mode == MODE_CODE) return VAL_ERROR;
 
 	struct PPC_Ctx run_ctx;
 	char *code;
@@ -35,5 +35,5 @@ MKINSTR(run)
 	}
 
 	free_ctx(&run_ctx);
-	return NULL;
+	return VAL_SUCCESS;
 }
