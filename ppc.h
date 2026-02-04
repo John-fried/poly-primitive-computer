@@ -29,6 +29,7 @@ struct PPC_Code {
 };
 
 struct PPC_Runtime {
+	uint16_t 		line;		/* line number for running process */
 	uint8_t			gpr[3];		/* general purpose register */
 	uint32_t 		pointer; 	/* current memory pointer/stack pointer */
 	MemorySlot *		slots;		/* the memory slots */
@@ -38,12 +39,11 @@ struct PPC_Runtime {
 	RunMode 		mode;		/* running mode: code || direct*/
 };
 
-struct PPC_State{
+struct PPC_State {
 	unsigned int 		pipeline : 1;	/* (bool) on pipeline mode (example: from subevaluate) */
 };
 
 struct PPC_Ctx {
-	uint16_t 		line;		/* line number*/
 	uint8_t 		argc;		/* arguments count */
 	char *			argv[ARGSSIZE]; /* arguments vector */
 	char *			full_string;	/* original input */
@@ -69,7 +69,6 @@ typedef struct PPC_Value {
 
 /* Global state */
 extern struct PPC_Runtime ppc_runtime;
-extern struct PPC_Ctx ppc_context;
 extern struct PPC_Reg ppc_registers[];
 
 /* utility to initialize an empty PPC_Ctx struct,

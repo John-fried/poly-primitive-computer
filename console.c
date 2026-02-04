@@ -21,14 +21,14 @@ void console_err(const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
-	_console_diag(RED "Err" RESET, fmt, ap, ppc_context.line);
+	_console_diag(RED "Err" RESET, fmt, ap, ppc_runtime.line);
 }
 
 void console_warn(const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
-	_console_diag(YELLOW "Warn" RESET, fmt, ap, ppc_context.line);
+	_console_diag(YELLOW "Warn" RESET, fmt, ap, ppc_runtime.line);
 }
 
 void console_errno(void)

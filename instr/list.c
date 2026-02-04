@@ -17,7 +17,7 @@ MKINSTR(list)
 			continue;
 		char *code = ctx->runtime->code.code[i];
 
-		if (strlen(code) < 1)
+		if (!code[0])
 			continue;
 
 		IFNPIPE printf("%d %s\n", i, code);

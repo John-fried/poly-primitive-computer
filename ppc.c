@@ -15,7 +15,6 @@
 
 // init
 struct PPC_Runtime ppc_runtime;
-struct PPC_Ctx ppc_context;
 
 void init_ctx(struct PPC_Ctx *ctx)
 {
@@ -42,8 +41,6 @@ void ppc_init(void)
 	ppc_runtime.code.max_line = 0;
 	ppc_runtime.code.size = INITIAL_CODESIZE;
 	ppc_runtime.code.code = (char **)calloc(ppc_runtime.code.size, sizeof(char *));
-
-	init_ctx(&ppc_context);
 }
 
 /* Utility to free an array, using looping for size_t n */
@@ -58,27 +55,31 @@ void free_array(char **arr, size_t n)
 
 void ppc_loop(void)
 {
+	struct PPC_Ctx loop_ctx;
 	char line[LINESIZE];
+	init_ctx(&loop_ctx);
 
 	while (1) {
-		printf("] ");
+		putchar(']');
+		putchar(' ');
+
 		if (fgets(line, sizeof(line), stdin) == NULL)
 			break;
 
-		if (strlen(line) <= 1)
-			continue;
-
-		ppc_context.runtime->mode = MODE_DIRECT;
-		parse_line(line, &ppc_context);
-		eval(&ppc_context);
+		if (line[1]) {
+			ppc_runtime.mode = MODE_DIRECT;
+			parse_line(line, &loop_ctx);
+			eval(&loop_ctx);
+		}
 	}
+
+	free_ctx(&loop_ctx);
 }
 
 void ppc_exit(void)
 {
 	putchar('\n');
 	free(ppc_runtime.slots);
-	free_ctx(&ppc_context);
 	free_array(ppc_runtime.code.code, ppc_runtime.code.max_line);
 }
 

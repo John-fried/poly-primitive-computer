@@ -22,13 +22,13 @@ MKINSTR(run)
 
 		code = strdup(ctx->runtime->code.code[i]);
 
-		if (strlen(code) <= 1) {
+		if (!code[0]) {
 			free(code);
 			continue;
 		}
 
 		run_ctx.runtime->mode = MODE_CODE;
-		ppc_context.line = i;
+		ppc_runtime.line = i;
 
 		parse_line(code, &run_ctx);
 		eval(&run_ctx);
