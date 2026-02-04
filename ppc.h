@@ -13,41 +13,46 @@
 #include <stdint.h>
 
 typedef enum {
-	MODE_DIRECT,
-	MODE_CODE
+	MODE_DIRECT,				/* on normal input mode*/
+	MODE_CODE				/* on running code*/
 } RunMode;
 
 typedef struct {
-	uint8_t 		data;
+	uint8_t 		data;		/* integrer data 0-255 */
 } MemorySlot;
 
 struct PPC_Code {
-	char **			code;
-	uint32_t 		max_line;
-	uint32_t 		size;
+	char **			code;		/* code slots */
+	uint32_t 		max_line;	/* code max_line */
+	uint32_t 		size;		/* code available size */
 };
 
 struct PPC_Runtime {
-	uint8_t			gpr[3];	/* general purpose register */
-	uint32_t 		pointer;
-	MemorySlot *		slots;
-	uint32_t 		slots_capacity;
+	uint8_t			gpr[3];		/* general purpose register */
+	uint32_t 		pointer; 	/* current memory pointer/stack pointer */
+	MemorySlot *		slots;		/* the memory slots */
+	uint32_t 		slots_capacity;	/* memory slots capacity */
 
-	struct 			PPC_Code code;
-	RunMode 		mode;
+	struct 			PPC_Code code;	/* code data */
+	RunMode 		mode;		/* running mode: code || direct*/
+};
+
+struct PPC_State{
+	unsigned int 		pipeline : 1;	/* (bool) on pipeline mode (example: from subevaluate) */
 };
 
 struct PPC_Ctx {
-	uint16_t 		line;
-	uint8_t 		argc;
-	char *			argv[ARGSSIZE];
-	char *			full_string;
-	struct PPC_Runtime *	runtime;
+	uint16_t 		line;		/* line number*/
+	uint8_t 		argc;		/* arguments count */
+	char *			argv[ARGSSIZE]; /* arguments vector */
+	char *			full_string;	/* original input */
+	struct PPC_Runtime *	runtime;	/* runtime link */
+	struct PPC_State *	state;		/* state dataa */
 };
 
 struct PPC_Reg {
-	char			alias[16];
-	void *			setter;
+	char			alias[16];	/* reg alias, example: sp */
+	void *			setter;		/* setter, a value to be changed*/
 };
 
 typedef enum {
@@ -56,17 +61,12 @@ typedef enum {
 } ValueType;
 
 typedef struct PPC_Value {
-	ValueType		type;
-	char *			string;
-	int 			value;
+	ValueType		type;		/* Value type */
+	char *			string;		/* If the value type is string */
+	int 			value;		/* If the value type is integrer */
 } PPC_Value;
 
-#define VAL_ERROR 		(PPC_Value){VAL_INTEGRER, "", 1}
-#define VAL_SUCCESS 		(PPC_Value){VAL_INTEGRER, "", 0}
-#define VAL_STR(x)		(PPC_Value){VAL_STRING, #x, 0}
-#define VAL_INT(x)		(PPC_Value){VAL_INTEGRER, "", x}
-
-/* Global struct */
+/* Global state */
 extern struct PPC_Runtime ppc_runtime;
 extern struct PPC_Ctx ppc_context;
 extern struct PPC_Reg ppc_registers[];
@@ -83,6 +83,7 @@ void ppc_init(void);
 void ppc_loop(void);
 void ppc_exit(void);
 
+/* utiltity to get register from an alias */
 void *ppc_get_register(char *alias);
 
 #endif /* PPC_H */

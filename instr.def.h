@@ -10,13 +10,22 @@ struct PPC_Instr {
 	instruction_handler handler;
 };
 
-#define MKINSTR(name) struct PPC_Value name ## _handler(struct PPC_Ctx *ctx) // will be replaced as: void NAME_handler(...)
-#define MKINSTR_L(name) {#name, name ## _handler}  // will be replaced as: {NAME, NAME_handler}
 
-// _MAKE_INSTR_USES_ - to avoid include issues in instr/*.c
+/* Macro for return value */
+#define VAL_ERROR 		(PPC_Value){VAL_INTEGRER, "", 1}
+#define VAL_SUCCESS 		(PPC_Value){VAL_INTEGRER, "", 0}
+#define VAL_STR(x)		(PPC_Value){VAL_STRING, #x, 0}
+#define VAL_INT(x)		(PPC_Value){VAL_INTEGRER, "", x}
+
+
+#define MKINSTR(name) struct PPC_Value name ## _handler(struct PPC_Ctx *ctx) /* macro to create a function */
+
+// _MAKE_INSTR_USES_ - define this if you want to make a list/function protoytpe
 #ifdef _MAKE_INSTR_USES_
 #define _MAKE_INSTR_USES_MACRO_
+#define MKINSTR_L(name) {#name, name ## _handler} /* make list */
 
+/* Function-prototype */
 MKINSTR(run);
 MKINSTR(list);
 MKINSTR(home);
@@ -24,6 +33,7 @@ MKINSTR(mov);
 MKINSTR(print);
 MKINSTR(trans);
 
+/* Insturction list */
 struct PPC_Instr instr_list[] = {
 	MKINSTR_L(run),
 	MKINSTR_L(list),
