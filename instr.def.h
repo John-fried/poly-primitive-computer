@@ -6,10 +6,19 @@
 typedef struct PPC_Value (*instruction_handler)(struct PPC_Ctx *context);
 
 struct PPC_Instr {
-	char name[64];
+	char *name;
 	instruction_handler handler;
-};
+} __attribute__((aligned(8)));
 
+/* Macro for instruction parameter */
+#define INSTR_PARAM 		struct PPC_Ctx *ctx
+
+/* Macro to create a function */
+#define MKINSTR(name) \
+    PPC_Value name##_handler(INSTR_PARAM); \
+    __attribute__((used, section("ppc_instr"))) \
+    static const struct PPC_Instr _entry_##name = { #name, name##_handler }; \
+    PPC_Value name##_handler(INSTR_PARAM)
 
 /* Macro for return value */
 #define VAL_ERROR 		(PPC_Value){VAL_INTEGRER, "", 1}
@@ -17,34 +26,12 @@ struct PPC_Instr {
 #define VAL_STR(x)		(PPC_Value){VAL_STRING, #x, 0}
 #define VAL_INT(x)		(PPC_Value){VAL_INTEGRER, "", x}
 
+/* Macro for conditional things */
 #define IFNPIPE			if (!ctx->state.pipeline)	/* if not in pipeline */
 
-#define MKINSTR(name) struct PPC_Value name ## _handler(struct PPC_Ctx *ctx) /* macro to create a function */
-
-// _MAKE_INSTR_USES_ - define this if you want to make a list/function protoytpe
-#ifdef _MAKE_INSTR_USES_
-#define _MAKE_INSTR_USES_MACRO_
-#define MKINSTR_L(name) {#name, name ## _handler} /* make list */
-
-/* Function-prototype */
-MKINSTR(run);
-MKINSTR(list);
-MKINSTR(home);
-MKINSTR(mov);
-MKINSTR(print);
-MKINSTR(trans);
-
-/* Insturction list */
-struct PPC_Instr instr_list[] = {
-	MKINSTR_L(run),
-	MKINSTR_L(list),
-	MKINSTR_L(home),
-	MKINSTR_L(mov),
-	MKINSTR_L(print),
-	MKINSTR_L(trans),
-};
-#define INST_COUNT ((int)(sizeof(instr_list) / sizeof(instr_list[0])))
-#endif /* _MAKE_INSTR_USES_MACRO_ */
-
+/* Macro for fast return - attribute prerequire */
+#define _ARGC_MIN(x)		if (ctx->argc < x) return VAL_ERROR;
+#define _DIRECT_ONLY		if (ctx->runtime->mode != MODE_DIRECT) return VAL_ERROR;
+#define _CODE_ONLY		if (ctx->runtime->mode != MODE_CODE) return VAL_ERROR;
 
 #endif /* INSTR_DEF_H */

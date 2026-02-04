@@ -2,7 +2,6 @@
  * TRANS - an instruction to translate characters into integrer
  **/
 
-#include "ppc.h"
 #include "instr.def.h"
 
 #include <stdint.h>
@@ -10,8 +9,7 @@
 
 MKINSTR(trans)
 {
-	if (ctx->argc == 1)
-		return VAL_ERROR;
+	_ARGC_MIN(2)
 
 	int character = ctx->argv[1][0];
 	IFNPIPE printf("%d\n", character);

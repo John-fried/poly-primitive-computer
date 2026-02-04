@@ -1,6 +1,5 @@
 /* LIST, ppc builtin command to see your code */
 
-#include "ppc.h"
 #include "instr.def.h"
 #include "color.h"
 

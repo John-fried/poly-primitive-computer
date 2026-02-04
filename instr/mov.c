@@ -11,8 +11,7 @@
 
 MKINSTR(mov)
 {
-	if (ctx->argc < 3)
-		return VAL_ERROR;
+	_ARGC_MIN(3)
 
 	int *dest_reg = NULL;
 	int *src_reg = ppc_get_register(ctx->argv[2]);

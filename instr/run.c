@@ -1,5 +1,4 @@
 #include "parser.h"
-#include "ppc.h"
 #include "eval.h"
 #include "instr.def.h"
 
@@ -9,8 +8,7 @@
 
 MKINSTR(run)
 {
-	if (ppc_runtime.mode == MODE_CODE)
-		return VAL_ERROR;
+	_DIRECT_ONLY
 
 	struct PPC_Ctx run_ctx;
 	char *code;
@@ -28,7 +26,7 @@ MKINSTR(run)
 		}
 
 		run_ctx.runtime->mode = MODE_CODE;
-		ppc_runtime.line = i;
+		ctx->runtime->line = i;
 
 		parse_line(code, &run_ctx);
 		eval(&run_ctx);

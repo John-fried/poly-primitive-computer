@@ -1,6 +1,5 @@
 TARGET = ppc
 FLAGS = -MMD -Wall -Wextra -Wpedantic -I. -s -O3 -ffunction-sections -fdata-sections
-LDFLAGS = -Wl,--gc-sections
 
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
@@ -19,7 +18,7 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	@mkdir -p $(BUILD_DIR)
 	@echo "  LD      $@"
-	@$(CC) $(OBJS) $(LDFLAGS) -o $@
+	@$(CC) $(OBJS) -o $@
 
 $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)

@@ -2,7 +2,6 @@
 
 #include "ppc.h"
 #include "eval.h"
-#define _MAKE_INSTR_USES_
 #include "instr.def.h"
 #include "console.h"
 #include "parser.h"
@@ -11,6 +10,10 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+
+/* Instruction */
+extern const struct PPC_Instr __start_ppc_instr;
+extern const struct PPC_Instr __stop_ppc_instr;
 
 /* Utility to realloc code without deleting the data*/
 int realloc_codesize(void)
@@ -80,11 +83,10 @@ PPC_Value eval(struct PPC_Ctx *ctx)
 	char *line = strdup(ctx->full_string);
 	preprocess_line(line, ctx);
 
-	for (int i = 0; i < INST_COUNT; i++) {
-		if (strcmp(instr_list[i].name, ctx->argv[0]) == 0) {
-			PPC_Value ret;
-
-			ret = instr_list[i].handler(ctx);
+	const struct PPC_Instr *it = &__start_ppc_instr;
+	for (; it < &__stop_ppc_instr; it++) {
+		if (strcmp(it->name, ctx->argv[0]) == 0) {
+			PPC_Value ret = it->handler(ctx);
 			free(line);
 			return ret;
 		}

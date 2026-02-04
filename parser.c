@@ -121,7 +121,8 @@ STATIC void process_subevaluate(char *line)
 {
 	char *open, *close;
 
-	while ((open = strstr(line, PARSER_TOK_SUBEVAL_OPEN)) && (close = strstr(open, PARSER_TOK_SUBEVAL_CLOSE))) {
+	while ((open = strstr(line, PARSER_TOK_SUBEVAL_OPEN)) &&
+	       (close = strstr(open, PARSER_TOK_SUBEVAL_CLOSE))) {
 		size_t inner_len = close - (open + 1);
 		char *inner_cmd = strndup(open + 1, inner_len);
 

@@ -81,7 +81,7 @@ void free_ctx(struct PPC_Ctx *ctx);
 
 void ppc_init(void);
 void ppc_loop(void);
-void ppc_exit(void);
+void ppc_exit(void) __attribute__((destructor));
 
 /* utiltity to get register from an alias */
 void *ppc_get_register(char *alias);
