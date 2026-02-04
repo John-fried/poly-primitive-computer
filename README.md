@@ -22,7 +22,7 @@ Apa itu **Poly Primitive Computer**?, **Poly Primitive Computer** atau bisa disi
 130 mov 9, gpr0         ; Pakai gpr0 (l)
 140 mov 10, [trans d]
 150 mov 11, [trans !]
-160 print 0..11		: Gambar indeks 0-11
+160 print 0..11		; Gambar indeks 0-11
 ```
 
 Setelah itu jalankan perintah `run`:
