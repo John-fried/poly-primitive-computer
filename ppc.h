@@ -47,7 +47,7 @@ struct PPC_Ctx {
 	char *			argv[ARGSSIZE]; /* arguments vector */
 	char *			full_string;	/* original input */
 	struct PPC_Runtime *	runtime;	/* runtime link */
-	struct PPC_State *	state;		/* state dataa */
+	struct PPC_State	state;		/* state dataa */
 };
 
 struct PPC_Reg {

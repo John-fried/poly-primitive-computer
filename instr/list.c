@@ -18,7 +18,7 @@ MKINSTR(list)
 
 		if (strlen(code) < 1) continue;
 
-		printf("%d %s\n", i, code);
+		IFNPIPE printf("%d %s\n", i, code);
 	}
 
 	return VAL_INT(i);

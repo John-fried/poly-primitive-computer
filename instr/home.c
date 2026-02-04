@@ -6,7 +6,7 @@
 MKINSTR(home)
 {
 	(void) ctx;
-	printf("\033[H\033[2J\033[3J");
+	IFNPIPE printf("\033[H\033[2J\033[3J");
 	fflush(stdout);
 	return VAL_SUCCESS;
 }

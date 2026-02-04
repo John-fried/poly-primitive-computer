@@ -136,10 +136,13 @@ STATIC void process_subevaluate(char *line)
                 size_t inner_len = close - (open + 1);
                 char *inner_cmd = strndup(open + 1, inner_len);
 
-                /* initialize context & evaluate */
+                /* initialize context */
                 struct PPC_Ctx sub_ctx;
                 init_ctx(&sub_ctx);
                 parse_line(inner_cmd, &sub_ctx);
+                sub_ctx.state.pipeline = 1; /* mark as a pipeline for subevaluate */
+
+                /* evaluate */
                 PPC_Value res = eval(&sub_ctx);
 
                 /* handle result value */

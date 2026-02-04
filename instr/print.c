@@ -18,10 +18,10 @@ MKINSTR(print)
 
 			find_range(ctx->argv[i], &min, &max);
 			for (int j = min; j <= max; j++) {
-				putchar(mmag_get(j));
+					IFNPIPE putchar(mmag_get(j));
 			}
 		} else
-			putchar(mmag_get(atoi(ctx->argv[i])));
+			IFNPIPE putchar(mmag_get(atoi(ctx->argv[i])));
 	}
 
 

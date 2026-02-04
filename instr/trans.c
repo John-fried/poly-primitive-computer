@@ -13,6 +13,6 @@ MKINSTR(trans)
 	if (ctx->argc == 1) return VAL_ERROR;
 
 	int character = ctx->argv[1][0];
-	printf("%d\n", character);
+	IFNPIPE printf("%d\n", character);
 	return VAL_INT(character);
 }

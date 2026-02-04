@@ -24,7 +24,7 @@ void init_ctx(struct PPC_Ctx *ctx)
 	ctx->argv[0] = NULL;
 	ctx->argc = 0;
 	ctx->full_string = NULL;
-	ctx->state->pipeline = 0;
+	ctx->state.pipeline = 0;
 }
 /* Utility to free context, avoiding the memory leak */
 void free_ctx(struct PPC_Ctx *ctx)

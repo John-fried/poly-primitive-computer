@@ -17,6 +17,7 @@ struct PPC_Instr {
 #define VAL_STR(x)		(PPC_Value){VAL_STRING, #x, 0}
 #define VAL_INT(x)		(PPC_Value){VAL_INTEGRER, "", x}
 
+#define IFNPIPE			if (!ctx->state.pipeline)	/* if not in pipeline */
 
 #define MKINSTR(name) struct PPC_Value name ## _handler(struct PPC_Ctx *ctx) /* macro to create a function */
 
