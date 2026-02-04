@@ -17,7 +17,6 @@
 struct PPC_Runtime ppc_runtime;
 struct PPC_Ctx ppc_context;
 
-
 void init_ctx(struct PPC_Ctx *ctx)
 {
 	ctx->runtime = &ppc_runtime;
@@ -26,6 +25,7 @@ void init_ctx(struct PPC_Ctx *ctx)
 	ctx->full_string = NULL;
 	ctx->state.pipeline = 0;
 }
+
 /* Utility to free context, avoiding the memory leak */
 void free_ctx(struct PPC_Ctx *ctx)
 {
@@ -37,12 +37,11 @@ void ppc_init(void)
 {
 	ppc_runtime.pointer = 0;
 	ppc_runtime.slots_capacity = INITIAL_SLOTSIZE;
-	ppc_runtime.slots = malloc(ppc_runtime.slots_capacity *
-				   sizeof(MemorySlot));
+	ppc_runtime.slots = malloc(ppc_runtime.slots_capacity * sizeof(MemorySlot));
 	ppc_runtime.mode = MODE_DIRECT;
 	ppc_runtime.code.max_line = 0;
 	ppc_runtime.code.size = INITIAL_CODESIZE;
-	ppc_runtime.code.code = (char **) calloc(ppc_runtime.code.size, sizeof(char *));
+	ppc_runtime.code.code = (char **)calloc(ppc_runtime.code.size, sizeof(char *));
 
 	init_ctx(&ppc_context);
 }
@@ -66,7 +65,8 @@ void ppc_loop(void)
 		if (fgets(line, sizeof(line), stdin) == NULL)
 			break;
 
-		if (strlen(line) <= 1) continue;
+		if (strlen(line) <= 1)
+			continue;
 
 		ppc_context.runtime->mode = MODE_DIRECT;
 		parse_line(line, &ppc_context);

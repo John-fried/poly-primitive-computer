@@ -13,10 +13,12 @@ MKINSTR(list)
 	uint32_t i;
 
 	for (i = 0; i <= ctx->runtime->code.max_line; i++) {
-		if (!ctx->runtime->code.code[i]) continue;
+		if (!ctx->runtime->code.code[i])
+			continue;
 		char *code = ctx->runtime->code.code[i];
 
-		if (strlen(code) < 1) continue;
+		if (strlen(code) < 1)
+			continue;
 
 		IFNPIPE printf("%d %s\n", i, code);
 	}

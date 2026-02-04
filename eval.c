@@ -15,11 +15,12 @@
 /* Utility to realloc code without deleting the data*/
 int realloc_codesize(void)
 {
-	if (ppc_runtime.code.max_line < ppc_runtime.code.size) return 0;
+	if (ppc_runtime.code.max_line < ppc_runtime.code.size)
+		return 0;
 
 	int old_line = ppc_runtime.code.size;
 	int new_line = ppc_runtime.code.max_line + 1;
-	int new_byte_size =  new_line * sizeof(char *);
+	int new_byte_size = new_line * sizeof(char *);
 
 	void *tmp = realloc(ppc_runtime.code.code, new_byte_size);
 
@@ -28,7 +29,7 @@ int realloc_codesize(void)
 		return -1;
 	}
 
-	ppc_runtime.code.code = (char **) tmp;
+	ppc_runtime.code.code = (char **)tmp;
 	ppc_runtime.code.size = new_line;
 
 	for (int i = old_line; i < new_line; i++)
@@ -92,4 +93,3 @@ PPC_Value eval(struct PPC_Ctx *ctx)
 	free(line);
 	return VAL_ERROR;
 }
-

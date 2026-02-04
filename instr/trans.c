@@ -10,7 +10,8 @@
 
 MKINSTR(trans)
 {
-	if (ctx->argc == 1) return VAL_ERROR;
+	if (ctx->argc == 1)
+		return VAL_ERROR;
 
 	int character = ctx->argv[1][0];
 	IFNPIPE printf("%d\n", character);
