@@ -23,7 +23,7 @@ struct PPC_Instr {
 /* Macro for return value */
 #define VAL_ERROR 		(PPC_Value){VAL_INTEGRER, "", 1}
 #define VAL_SUCCESS 		(PPC_Value){VAL_INTEGRER, "", 0}
-#define VAL_STR(x)		(PPC_Value){VAL_STRING, #x, 0}
+#define VAL_STR(x)		(PPC_Value){VAL_STRING, x, 0}
 #define VAL_INT(x)		(PPC_Value){VAL_INTEGRER, "", x}
 
 /* Macro for conditional things */

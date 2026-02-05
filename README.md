@@ -22,7 +22,7 @@ mov 8, gpr2         ; Pakai gpr2 (r)
 mov 9, gpr0         ; Pakai gpr0 (l)
 mov 10, [trans d]
 mov 11, [trans !]
-print 0..11		; Gambar indeks 0-11
+print "0..11"		; Gambar indeks 0-11
 ```
 
 Simpan file tersebut sebagai `Hello.ppc` dan jalankan ini di terminal

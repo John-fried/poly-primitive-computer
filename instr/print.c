@@ -1,4 +1,5 @@
 #include "ppc.h"
+#define PARSER_UTIL
 #include "parser.h"
 #include "memory.h"
 #include "instr.def.h"

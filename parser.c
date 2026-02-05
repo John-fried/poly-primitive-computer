@@ -1,38 +1,216 @@
 #include "ppc.h"
-#include "parser.h"
-#include "eval.h"
+#include "ast.h"
 #include "console.h"
+#include "parser.h"
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <string.h>
+#include <ctype.h>
+#include <stdio.h>
 
-void slice_string(char *line, struct PPC_Ctx *ctx)
+/* --- AST Utilities --- */
+
+struct ASTNode *ast_create(NodeType type, char *token)
 {
-	int i = 0;
-	ctx->argc = 0;
-	char *token;
+	struct ASTNode *node = malloc(sizeof(struct ASTNode));
+	node->type = type;
+	node->token = token ? strdup(token) : NULL;
+	node->argc = 0;
+	node->capacity = 2;
+	node->args = malloc(sizeof(struct ASTNode *) * node->capacity);
+	return node;
+}
 
-	while ((token = strsep(&line, PARSER_TOK_DELIM)) != NULL && i < ARGSSIZE) {
-		if (*token == '\0')
-			continue;
+void ast_add_arg(struct ASTNode *parent, struct ASTNode *child)
+{
+	if (parent->argc >= parent->capacity) {
+		parent->capacity *= 2;
+		parent->args =
+		    realloc(parent->args,
+			    sizeof(struct ASTNode *) * parent->capacity);
+	}
+	parent->args[parent->argc++] = child;
+}
 
-		ctx->argv[i++] = token;
-		ctx->argc++;
+void ast_free(struct ASTNode *node)
+{
+	if (!node)
+		return;
+	for (int i = 0; i < node->argc; i++) {
+		ast_free(node->args[i]);
+	}
+	if (node->token)
+		free(node->token);
+	free(node->args);
+	free(node);
+}
+
+/* --- The Parser Core --- */
+
+// Helper: Skip whitespace & commas
+STATIC void skip_junk(char **cursor)
+{
+	while (**cursor && (isspace(**cursor) || **cursor == ','))
+		(*cursor)++;
+}
+
+// Helper: Parse string literal "text"
+STATIC struct ASTNode *parse_string(char **cursor)
+{
+	(*cursor)++;		// Skip opening quote
+	char *start = *cursor;
+	while (**cursor && **cursor != '"')
+		(*cursor)++;
+
+	int len = *cursor - start;
+	char *val = malloc(len + 1);
+	strncpy(val, start, len);
+	val[len] = '\0';
+
+	if (**cursor == '"')
+		(*cursor)++;	// Skip closing quote
+
+	struct ASTNode *node = ast_create(NODE_STR, val);
+	free(val);
+	return node;
+}
+
+// Helper: Parse identifier/number
+STATIC struct ASTNode *parse_word(char **cursor)
+{
+	char *start = *cursor;
+
+	// Read until space, commas, subeval close
+	while (**cursor && !isspace(**cursor) && **cursor != ','
+	       && **cursor != PARSER_TOK_SUBEVAL_CLOSE)
+		(*cursor)++;
+
+	int len = *cursor - start;
+	char *val = malloc(len + 1);
+	strncpy(val, start, len);
+	val[len] = '\0';
+
+	// Detect type IDENTIFIER or DIGIT
+	NodeType type = NODE_ID;
+	if (isdigit(val[0]) || (val[0] == '-' && isdigit(val[1]))) {
+		type = NODE_INT;
+	}
+
+	struct ASTNode *node = ast_create(type, val);
+	free(val);
+	return node;
+}
+
+// Recursive function untuk parse expression
+struct ASTNode *parse_expr(char **cursor)
+{
+	skip_junk(cursor);
+	if (**cursor == '\0')
+		return NULL;
+
+	// Nested Expression: [cmd arg]
+	if (**cursor == PARSER_TOK_SUBEVAL_OPEN) {
+		(*cursor)++;	// Skip open
+
+		// Take command
+		skip_junk(cursor);
+		struct ASTNode *cmd_node = parse_word(cursor);
+		cmd_node->type = NODE_EXPR;
+
+		// Take arguments
+		while (**cursor && **cursor != PARSER_TOK_SUBEVAL_CLOSE) {
+			struct ASTNode *arg = parse_expr(cursor);
+			if (arg)
+				ast_add_arg(cmd_node, arg);
+			skip_junk(cursor);
+		}
+
+		if (**cursor == PARSER_TOK_SUBEVAL_CLOSE)
+			(*cursor)++;	// skip close
+		else
+			console_warn("Expected '%c' after '%c' (pair of '%c')",
+				PARSER_TOK_SUBEVAL_CLOSE, *(*cursor - 2), PARSER_TOK_SUBEVAL_OPEN);
+
+		return cmd_node;
+	}
+	// String literal
+	if (**cursor == '"') {
+		return parse_string(cursor);
+	}
+	// Regular Word / Number
+	return parse_word(cursor);
+}
+
+/* Entry-point: turning one line string into AST root*/
+struct ASTNode *parser_parse_line(char *line)
+{
+	char *comment_start = strchr(line, PARSER_TOK_COMMENT);
+	if (comment_start) *comment_start = '\0';
+
+	char *cursor = line;
+	skip_junk(&cursor);
+
+	if (*cursor == '\0')
+		return NULL;
+
+	/* Root instruction (example: 'mov') */
+	struct ASTNode *root = parse_word(&cursor);
+	root->type = NODE_ROOT;
+
+	while (1) {
+		skip_junk(&cursor);
+		if (*cursor == '\0')
+			break;
+
+		struct ASTNode *arg = parse_expr(&cursor);
+		if (arg)
+			ast_add_arg(root, arg);
+	}
+
+	return root;
+}
+
+void ast_print(struct ASTNode *node, int level)
+{
+	if (!node)
+		return;
+
+	for (int i = 0; i < level; i++)
+		printf("  ");	// Indent
+
+	char *type_name = "???";
+	switch (node->type) {
+	case NODE_ROOT:
+		type_name = "ROOT";
+		break;
+	case NODE_INT:
+		type_name = "INT";
+		break;
+	case NODE_STR:
+		type_name = "STR";
+		break;
+	case NODE_ID:
+		type_name = "ID";
+		break;
+	case NODE_EXPR:
+		type_name = "EXPR";
+		break;
+	}
+
+	if (node->type == NODE_ROOT)
+		printf("\n");
+
+	if (level > 0)
+		printf("| ");
+
+	printf("[%s] %s\n", type_name, node->token);
+
+	for (int i = 0; i < node->argc; i++) {
+		ast_print(node->args[i], level + 1);
 	}
 }
 
-char *remove_comment(char *line)
-{
-	char *found;
-
-	if ((found = strstr(line, PARSER_TOK_COMMENT)))
-		*found = 0;
-
-	return line;
-}
-
+/* Parsing utility */
 void find_range(const char *str, int *min, int *max)
 {
 	char *result;
@@ -62,94 +240,4 @@ void find_range(const char *str, int *min, int *max)
 	/* default value */
 	*min = 0;
 	*max = 1;
-}
-
-/* Preprocessing input handler logic*/
-
-/* stitch_string - utility to stitch orig string from open/close tag into replacement
- * example:
- *      tag: "[", "]"
- *      orig: "mov 0, [trans A]",
- *      replacement: "65",
- *      final: "mov 0, 65"
- */
-STATIC char *stitch_string(char *orig, const char *open_tag, const char *close_tag, const char *replacement)
-{
-	int prefix_len = open_tag - orig;
-	int middle_len = strlen(replacement);
-	int suffix_len = strlen(close_tag + 1);
-
-	char *new_string = malloc(prefix_len + middle_len + suffix_len + 1);
-	if (!new_string)
-		return orig;
-
-	/* stitching process */
-	memcpy(new_string, orig, prefix_len);	/* prefix (example 'mov 0, ')
-						 * memcpy take len as a character count,
-						 * not index, so it will only take to 'mov 0, ' (7 characters),
-						 * not 'mov 0, [' (7 index)
-						 */
-	memcpy(new_string + prefix_len, replacement, middle_len);	/* replacement */
-	memcpy(new_string + prefix_len + middle_len, close_tag + 1, suffix_len);	/* after close tag */
-	new_string[prefix_len + middle_len + suffix_len] = 0;
-
-	return new_string;
-}
-
-/* process_subevaluate(line) - utility to process subevaluate instruction
- * from a string line, and return the final result
- */
-STATIC void process_subevaluate(char *line)
-{
-	char *open, *close;
-	open = strstr(line, PARSER_TOK_SUBEVAL_OPEN);
-	close = strstr(line, PARSER_TOK_SUBEVAL_CLOSE);
-
-	if (!open) return;
-
-	if (open && !close) {
-		console_err("Expected '%s' at end of '%s'", PARSER_TOK_SUBEVAL_CLOSE,
-			PARSER_TOK_SUBEVAL_OPEN);
-		return;
-	}
-
-	size_t inner_len = close - (open + 1);
-	char *inner_cmd = strndup(open + 1, inner_len);
-
-	/* initialize context */
-	struct PPC_Ctx sub_ctx;
-	init_ctx(&sub_ctx);
-	parse_line(inner_cmd, &sub_ctx);
-	sub_ctx.state.pipeline = 1;	/* mark as a pipeline for subevaluate */
-
-	/* evaluate */
-	PPC_Value res = eval(&sub_ctx);
-
-	/* handle result value */
-	char res_buffer[32];
-	char *final_replacement;
-
-	if (res.type == VAL_INTEGRER) {
-		sprintf(res_buffer, "%d", res.value);
-		final_replacement = res_buffer;
-	} else
-		final_replacement = res.string;
-
-	/* replace old string to result */
-	char *temp_line = stitch_string(line, open, close, final_replacement);
-	strcpy(line, temp_line);
-
-	/* cleanup */
-	free(inner_cmd);
-	free(temp_line);
-}
-
-void parse_line(char *line, struct PPC_Ctx *ctx)
-{
-	/* Preprocessing */
-	line = remove_comment(line);
-	process_subevaluate(line);
-
-	/* Final: tokenize string */
-	slice_string(line, ctx);
 }
