@@ -27,11 +27,10 @@ struct PPC_Instr {
 #define VAL_INT(x)		(PPC_Value){VAL_INTEGRER, "", x}
 
 /* Macro for conditional things */
+#define IFPIPE			if (ctx->state.pipeline)	/* if in pipeline */
 #define IFNPIPE			if (!ctx->state.pipeline)	/* if not in pipeline */
 
 /* Macro for fast return - attribute prerequire */
 #define _ARGC_MIN(x)		if (ctx->argc < x) return VAL_ERROR;
-#define _DIRECT_ONLY		if (ctx->runtime->mode != MODE_DIRECT) return VAL_ERROR;
-#define _CODE_ONLY		if (ctx->runtime->mode != MODE_CODE) return VAL_ERROR;
 
 #endif /* INSTR_DEF_H */

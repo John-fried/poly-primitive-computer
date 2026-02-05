@@ -3,14 +3,16 @@
 #include "memory.h"
 #include "instr.def.h"
 
+#include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 
 MKINSTR(print)
 {
-	if (ctx->argc == 1)
-		return VAL_ERROR;
+	IFPIPE return VAL_ERROR;
+
+	_ARGC_MIN(2)
+	char c;
 
 	for (int i = 1; i < ctx->argc; i++) {
 		/* find range between n1..n2 */
@@ -19,12 +21,15 @@ MKINSTR(print)
 
 			find_range(ctx->argv[i], &min, &max);
 			for (int j = min; j <= max; j++) {
-				IFNPIPE putchar(mem_get(j));
+				c = mem_get(j);
+				write(1, &c, 1);
 			}
-		} else
-			IFNPIPE putchar(mem_get(atoi(ctx->argv[i])));
+		} else {
+			c = mem_get(atoi(ctx->argv[i]));
+			write(1, &c, 1);
+		}
 	}
 
-	putchar('\n');
+	write(1, "\n", 1);
 	return VAL_SUCCESS;
 }

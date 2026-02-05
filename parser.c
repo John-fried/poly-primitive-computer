@@ -1,6 +1,7 @@
 #include "ppc.h"
 #include "parser.h"
 #include "eval.h"
+#include "console.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,17 +31,6 @@ char *remove_comment(char *line)
 		*found = 0;
 
 	return line;
-}
-
-void parse_line(char *line, struct PPC_Ctx *ctx)
-{
-	if (ctx->full_string != NULL) {
-		free(ctx->full_string);
-		ctx->full_string = NULL;
-	}
-
-	ctx->full_string = strdup(line);
-	slice_string(line, ctx);
 }
 
 void find_range(const char *str, int *min, int *max)
@@ -74,15 +64,6 @@ void find_range(const char *str, int *min, int *max)
 	*max = 1;
 }
 
-int hasdigit(const char *str)
-{
-	while (*str)
-		if (!isdigit(*str++))
-			return 0;
-
-	return 1;
-}
-
 /* Preprocessing input handler logic*/
 
 /* stitch_string - utility to stitch orig string from open/close tag into replacement
@@ -110,6 +91,7 @@ STATIC char *stitch_string(char *orig, const char *open_tag, const char *close_t
 						 */
 	memcpy(new_string + prefix_len, replacement, middle_len);	/* replacement */
 	memcpy(new_string + prefix_len + middle_len, close_tag + 1, suffix_len);	/* after close tag */
+	new_string[prefix_len + middle_len + suffix_len] = 0;
 
 	return new_string;
 }
@@ -120,47 +102,54 @@ STATIC char *stitch_string(char *orig, const char *open_tag, const char *close_t
 STATIC void process_subevaluate(char *line)
 {
 	char *open, *close;
+	open = strstr(line, PARSER_TOK_SUBEVAL_OPEN);
+	close = strstr(line, PARSER_TOK_SUBEVAL_CLOSE);
 
-	while ((open = strstr(line, PARSER_TOK_SUBEVAL_OPEN)) &&
-	       (close = strstr(open, PARSER_TOK_SUBEVAL_CLOSE))) {
-		size_t inner_len = close - (open + 1);
-		char *inner_cmd = strndup(open + 1, inner_len);
+	if (!open) return;
 
-		/* initialize context */
-		struct PPC_Ctx sub_ctx;
-		init_ctx(&sub_ctx);
-		parse_line(inner_cmd, &sub_ctx);
-		sub_ctx.state.pipeline = 1;	/* mark as a pipeline for subevaluate */
-
-		/* evaluate */
-		PPC_Value res = eval(&sub_ctx);
-
-		/* handle result value */
-		char res_buffer[32];
-		char *final_replacement;
-
-		if (res.type == VAL_INTEGRER) {
-			sprintf(res_buffer, "%d", res.value);
-			final_replacement = res_buffer;
-		} else
-			final_replacement = res.string;
-
-		/* slitch string - replace subeval to result */
-		char *temp_line = stitch_string(line, open, close, final_replacement);
-		strcpy(line, temp_line);
-
-		/* cleanup */
-		free(inner_cmd);
-		free(temp_line);
+	if (open && !close) {
+		console_err("Expected '%s' at end of '%s'", PARSER_TOK_SUBEVAL_CLOSE,
+			PARSER_TOK_SUBEVAL_OPEN);
+		return;
 	}
+
+	size_t inner_len = close - (open + 1);
+	char *inner_cmd = strndup(open + 1, inner_len);
+
+	/* initialize context */
+	struct PPC_Ctx sub_ctx;
+	init_ctx(&sub_ctx);
+	parse_line(inner_cmd, &sub_ctx);
+	sub_ctx.state.pipeline = 1;	/* mark as a pipeline for subevaluate */
+
+	/* evaluate */
+	PPC_Value res = eval(&sub_ctx);
+
+	/* handle result value */
+	char res_buffer[32];
+	char *final_replacement;
+
+	if (res.type == VAL_INTEGRER) {
+		sprintf(res_buffer, "%d", res.value);
+		final_replacement = res_buffer;
+	} else
+		final_replacement = res.string;
+
+	/* replace old string to result */
+	char *temp_line = stitch_string(line, open, close, final_replacement);
+	strcpy(line, temp_line);
+
+	/* cleanup */
+	free(inner_cmd);
+	free(temp_line);
 }
 
-void preprocess_line(char *line, struct PPC_Ctx *ctx)
+void parse_line(char *line, struct PPC_Ctx *ctx)
 {
-	/* preprocessing */
+	/* Preprocessing */
 	line = remove_comment(line);
 	process_subevaluate(line);
 
-	/* final parse */
-	parse_line(line, ctx);
+	/* Final: tokenize string */
+	slice_string(line, ctx);
 }

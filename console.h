@@ -4,7 +4,7 @@
 void console_err(const char *fmt, ...);
 void console_warn(const char *fmt, ...);
 
-/* console_errno - directly print error with str errno */
+/* console_errno - directly print last errno with strerrno */
 void console_errno(void);
 
 #endif /* CONSOLE_H */

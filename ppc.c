@@ -21,66 +21,21 @@ void init_ctx(struct PPC_Ctx *ctx)
 	ctx->runtime = &ppc_runtime;
 	ctx->argv[0] = NULL;
 	ctx->argc = 0;
-	ctx->full_string = NULL;
 	ctx->state.pipeline = 0;
-}
-
-/* Utility to free context, avoiding the memory leak */
-void free_ctx(struct PPC_Ctx *ctx)
-{
-	if (ctx->full_string != NULL)
-		free(ctx->full_string);
 }
 
 void ppc_init(void)
 {
+	ppc_runtime.line = 0;
 	ppc_runtime.pointer = 0;
 	ppc_runtime.slots_capacity = INITIAL_SLOTSIZE;
 	ppc_runtime.slots = malloc(ppc_runtime.slots_capacity * sizeof(MemorySlot));
-	ppc_runtime.mode = MODE_DIRECT;
-	ppc_runtime.code.max_line = 0;
-	ppc_runtime.code.size = INITIAL_CODESIZE;
-	ppc_runtime.code.code = (char **)calloc(ppc_runtime.code.size, sizeof(char *));
 }
 
-/* Utility to free an array, using looping for size_t n */
-void free_array(char **arr, size_t n)
+void ppc_halt(void)
 {
-	for (size_t i = 0; i <= n; i++) {
-		if (arr[i])
-			free(arr[i]);
-	}
-	free(arr);
-}
-
-void ppc_loop(void)
-{
-	struct PPC_Ctx loop_ctx;
-	char line[LINESIZE];
-	init_ctx(&loop_ctx);
-
-	while (1) {
-		putchar(']');
-		putchar(' ');
-
-		if (fgets(line, sizeof(line), stdin) == NULL)
-			break;
-
-		if (line[1]) {
-			ppc_runtime.mode = MODE_DIRECT;
-			parse_line(line, &loop_ctx);
-			eval(&loop_ctx);
-		}
-	}
-
-	free_ctx(&loop_ctx);
-}
-
-void ppc_exit(void)
-{
-	putchar('\n');
 	free(ppc_runtime.slots);
-	free_array(ppc_runtime.code.code, ppc_runtime.code.max_line);
+	exit(0);
 }
 
 void *ppc_get_register(char *alias)
