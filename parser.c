@@ -8,34 +8,42 @@
 #include <ctype.h>
 #include <stdio.h>
 
-STATIC void expect(int c)
+/*forward declarations*/
+int isnumeric(char *s);
+
+/*global variables*/
+ST_DATA char *cursor;
+
+ST_FUNC void expect(int c)
 {
 	console_err("'%c' expected", c);
 }
 
-/* --- The Parser Core --- */
-
-// Helper: Skip whitespace & commas
-STATIC void skip_junk(char **cursor)
+ST_FUNC void advance(void)
 {
-	while (**cursor && (isspace(**cursor) || **cursor == ','))
-		(*cursor)++;
+	if (*cursor != '\0')
+		cursor++;
 }
 
-// Helper: Parse string literal "text"
-STATIC struct ASTNode *parse_string(char **cursor)
+ST_FUNC void skip_junk(void)
 {
-	(*cursor)++;		// Skip opening quote
-	char *start = *cursor;
-	while (**cursor && **cursor != '"')
-		(*cursor)++;
+	while (*cursor && (isspace(*cursor) || *cursor == ','))
+		cursor++;
+}
 
-	int len = *cursor - start;
+ST_FUNC struct ASTNode *parse_string(void)
+{
+	advance();		// Skip opening quote
+	char *start = cursor;
+	while (*cursor && *cursor != '"')
+		advance();
+
+	int len = cursor - start;
 	char *val = malloc(len + 1);
 	memcpy(val, start, len);
 	val[len] = '\0';
 
-	if (**cursor == '"')
+	if (*cursor == '"')
 		(*cursor)++;	// Skip closing quote
 
 	struct ASTNode *node = ast_create(NODE_STR, val);
@@ -43,24 +51,25 @@ STATIC struct ASTNode *parse_string(char **cursor)
 	return node;
 }
 
-// Helper: Parse identifier/number
-STATIC struct ASTNode *parse_word(char **cursor)
+ST_FUNC struct ASTNode *parse_word(void)
 {
-	char *start = *cursor;
+	char *start = cursor;
 
 	// Read until space, commas, subeval close
-	while (**cursor && !isspace(**cursor) && **cursor != ','
-	       && **cursor != PARSER_TOK_SUBEVAL_CLOSE)
-		(*cursor)++;
+	while (*cursor && !isspace(*cursor) && *cursor != ','
+	       && *cursor != PARSER_TOK_SUBEVAL_CLOSE)
+		advance();
 
-	int len = *cursor - start;
+	int len = cursor - start;
+	if (len <= 0) return NULL;
+
 	char *val = malloc(len + 1);
-	strncpy(val, start, len);
+	memcpy(val, start, len);
 	val[len] = '\0';
 
 	// Detect type IDENTIFIER or DIGIT
 	NodeType type = NODE_ID;
-	if (isdigit(val[0]) || (val[0] == '-' && isdigit(val[1]))) {
+	if (isnumeric(val)) {
 		type = NODE_INT;
 	}
 
@@ -70,42 +79,42 @@ STATIC struct ASTNode *parse_word(char **cursor)
 }
 
 // Recursive function untuk parse expression
-struct ASTNode *parse_expr(char **cursor)
+struct ASTNode *parse_expr(void)
 {
-	skip_junk(cursor);
-	if (**cursor == '\0')
+	skip_junk();
+	if (*cursor == '\0')
 		return NULL;
 
 	// Nested Expression: [cmd arg]
-	if (**cursor == PARSER_TOK_SUBEVAL_OPEN) {
-		(*cursor)++;	// Skip open
+	if (*cursor == PARSER_TOK_SUBEVAL_OPEN) {
+		advance();	// Skip open
+		skip_junk();
 
 		// Take command
-		skip_junk(cursor);
-		struct ASTNode *cmd_node = parse_word(cursor);
+		struct ASTNode *cmd_node = parse_word();
 		cmd_node->type = NODE_EXPR;
 
 		// Take arguments
-		while (**cursor && **cursor != PARSER_TOK_SUBEVAL_CLOSE) {
-			struct ASTNode *arg = parse_expr(cursor);
+		while (*cursor && *cursor != PARSER_TOK_SUBEVAL_CLOSE) {
+			struct ASTNode *arg = parse_expr();
 			if (arg)
 				ast_add_arg(cmd_node, arg);
-			skip_junk(cursor);
+			skip_junk();	/* skip argument ws */
 		}
 
-		if (**cursor == PARSER_TOK_SUBEVAL_CLOSE)
-			(*cursor)++;	// skip close
+		if (*cursor == PARSER_TOK_SUBEVAL_CLOSE)
+			advance();	// skip close
 		else
 			expect(PARSER_TOK_SUBEVAL_CLOSE);
 
 		return cmd_node;
 	}
 	// String literal
-	if (**cursor == '"') {
-		return parse_string(cursor);
+	if (*cursor == '"') {
+		return parse_string();
 	}
 	// Regular Word / Number
-	return parse_word(cursor);
+	return parse_word();
 }
 
 /* Entry-point: turning one line string into AST root*/
@@ -114,22 +123,25 @@ struct ASTNode *parser_parse_line(char *line)
 	char *comment_start = strchr(line, PARSER_TOK_COMMENT);
 	if (comment_start) *comment_start = '\0';
 
-	char *cursor = line;
-	skip_junk(&cursor);
+	cursor = line;
+	skip_junk();
 
 	if (*cursor == '\0')
 		return NULL;
 
 	/* Root instruction (example: 'mov') */
-	struct ASTNode *root = parse_word(&cursor);
+	struct ASTNode *root = parse_word();
+	if (!root) {
+		console_errno();
+		return NULL;
+	}
 	root->type = NODE_ROOT;
 
 	while (1) {
-		skip_junk(&cursor);
-		if (*cursor == '\0')
-			break;
+		skip_junk();
+		if (*cursor == '\0') break;
 
-		struct ASTNode *arg = parse_expr(&cursor);
+		struct ASTNode *arg = parse_expr();
 		if (arg)
 			ast_add_arg(root, arg);
 	}
@@ -137,47 +149,19 @@ struct ASTNode *parser_parse_line(char *line)
 	return root;
 }
 
-void ast_print(struct ASTNode *node, int level)
+/************************************************************/
+/* Parsing utility */
+int isnumeric(char *s)
 {
-	if (!node)
-		return;
+	if (*s == '\0') return 0;
+	if (*s == '-') s++;
 
-	for (int i = 0; i < level; i++)
-		printf("  ");	// Indent
+	for (; *s; s++)
+		if (!isdigit((unsigned char)*s)) return 0;
 
-	char *type_name = "???";
-	switch (node->type) {
-	case NODE_ROOT:
-		type_name = "ROOT";
-		break;
-	case NODE_INT:
-		type_name = "INT";
-		break;
-	case NODE_STR:
-		type_name = "STR";
-		break;
-	case NODE_ID:
-		type_name = "ID";
-		break;
-	case NODE_EXPR:
-		type_name = "EXPR";
-		break;
-	}
-
-	if (node->type == NODE_ROOT)
-		printf("\n");
-
-	if (level > 0)
-		printf("| ");
-
-	printf("[%s] %s\n", type_name, node->token);
-
-	for (int i = 0; i < node->argc; i++) {
-		ast_print(node->args[i], level + 1);
-	}
+	return 1;
 }
 
-/* Parsing utility */
 void find_range(const char *str, int *min, int *max)
 {
 	char *result;

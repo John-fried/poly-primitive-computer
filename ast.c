@@ -21,9 +21,8 @@ void ast_add_arg(struct ASTNode *parent, struct ASTNode *child)
 {
 	if (parent->argc >= parent->capacity) {
 		parent->capacity *= 2;
-		parent->args =
-		    realloc(parent->args,
-			    sizeof(struct ASTNode *) * parent->capacity);
+		parent->args = realloc(parent->args,
+			sizeof(struct ASTNode *) * parent->capacity);
 	}
 	parent->args[parent->argc++] = child;
 }
@@ -39,4 +38,45 @@ void ast_free(struct ASTNode *node)
 		free(node->token);
 	free(node->args);
 	free(node);
+}
+
+/*************************************************/
+void ast_print(struct ASTNode *node, int level)
+{
+	if (!node)
+		return;
+
+	for (int i = 0; i < level; i++)
+		printf("  ");	// Indent
+
+	char *type_name = "???";
+	switch (node->type) {
+	case NODE_ROOT:
+		type_name = "ROOT";
+		break;
+	case NODE_INT:
+		type_name = "INT";
+		break;
+	case NODE_STR:
+		type_name = "STR";
+		break;
+	case NODE_ID:
+		type_name = "ID";
+		break;
+	case NODE_EXPR:
+		type_name = "EXPR";
+		break;
+	}
+
+	if (node->type == NODE_ROOT)
+		printf("\n");
+
+	if (level > 0)
+		printf("| ");
+
+	printf("[%s] %s\n", type_name, node->token);
+
+	for (int i = 0; i < node->argc; i++) {
+		ast_print(node->args[i], level + 1);
+	}
 }

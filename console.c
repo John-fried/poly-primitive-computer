@@ -7,7 +7,7 @@
 #include <string.h>
 #include <errno.h>
 
-STATIC void _console_diag(const char *prefix, const char *fmt, va_list ap, int line)
+ST_FUNC void _console_diag(const char *prefix, const char *fmt, va_list ap, int line)
 {
 	fprintf(stderr, BOLD"%s:"RESET, prefix);
 	if (line > 0)

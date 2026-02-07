@@ -1,7 +1,7 @@
 /* parser - a pack of utility to parse string and more*/
 
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef PPC_PARSER_H
+#define PPC_PARSER_H
 
 #define PARSER_TOK_COMMENT 		';'
 #define PARSER_TOK_SUBEVAL_OPEN 	'['
@@ -10,17 +10,16 @@
 #include "ast.h"
 
 struct ASTNode *parser_parse_line(char *line);
-struct ASTNode *ast_create(NodeType type, char *token);
-void ast_add_arg(struct ASTNode *parent, struct ASTNode *child);
-void ast_free(struct ASTNode *node);
 
 /* --- Utility --- */
 
-#ifdef PARSER_DEBUG
-void ast_print(struct ASTNode *node, int level);
-#endif
-
 #ifdef PARSER_UTIL
+
+/* isnumeric - check if a string is a numerical value
+ * error: -1 ("123abc")
+ * passed: 0 ("120")
+ */
+int isnumeric(char *s);
 
 /* find_range(str, *min, *max) - utility to find range between
  * integrer N1..N2, and stores min/max integrer into min
@@ -30,4 +29,4 @@ void ast_print(struct ASTNode *node, int level);
 void find_range(const char *str, int *min, int *max);
 #endif
 
-#endif /* PARSER_H */
+#endif /* PPC_PARSER_H */

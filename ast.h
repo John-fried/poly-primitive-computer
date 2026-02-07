@@ -1,5 +1,5 @@
-#ifndef AST_H
-#define AST_H
+#ifndef PPC_AST_H
+#define PPC_AST_H
 
 typedef enum {
     NODE_ROOT,      // Main Instruction (example: mov, print)
@@ -23,4 +23,8 @@ void ast_add_arg(struct ASTNode *parent, struct ASTNode *child);
 void ast_free(struct ASTNode *node);
 void ast_print(struct ASTNode *node, int level); // for debug
 
+#ifdef PARSER_DEBUG
+void ast_print(struct ASTNode *node, int level);
 #endif
+
+#endif /* PPC_AST_H */

@@ -8,7 +8,19 @@
 #define likely(x)     		__builtin_expect(!!(x), 1)
 #define unlikely(x)    		__builtin_expect(!!(x), 0)
 
-#define STATIC 			static
+#ifndef ONE_SOURCE
+# define ONE_SOURCE 1
+#endif
+
+#if ONE_SOURCE
+#define ST_INLN static inline
+#define ST_FUNC static
+#define ST_DATA static
+#else
+#define ST_INLN
+#define ST_FUNC
+#define ST_DATA extern
+#endif
 
 #include <stdint.h>
 

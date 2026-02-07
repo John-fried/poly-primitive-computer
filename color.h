@@ -1,5 +1,5 @@
-#ifndef COLOR_H
-#define COLOR_H
+#ifndef PPC_COLOR_H
+#define PPC_COLOR_H
 
 #define RESET	"\033[0m"
 #define BOLD	"\033[1m"
@@ -12,4 +12,4 @@
 
 #define BRIGHT_GREEN	"\033[92m"
 
-#endif /* COLOR_H */
+#endif /* PPC_COLOR_H */

@@ -1,5 +1,5 @@
-#ifndef INSTR_DEF_H
-#define INSTR_DEF_H
+#ifndef PPC_INSTR_DEF_H
+#define PPC_INSTR_DEF_H
 
 #include "ppc.h"
 
@@ -33,4 +33,4 @@ struct PPC_Instr {
 /* Macro for fast return - attribute prerequire */
 #define _ARGC_MIN(x)		if (ctx->argc < x) return VAL_ERROR;
 
-#endif /* INSTR_DEF_H */
+#endif /* PPC_INSTR_DEF_H */

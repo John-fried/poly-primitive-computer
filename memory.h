@@ -1,5 +1,5 @@
-#ifndef MMAGUTIL_H
-#define MMAGUTIL_H
+#ifndef PPC_MMAGUTIL_H
+#define PPC_MMAGUTIL_H
 
 #include <stdint.h>
 
@@ -24,4 +24,4 @@ int mem_write(int idx, uint8_t c);
 int mem_get(int idx);
 
 
-#endif /* MMAGUTIL_H */
+#endif /* PPC_MMAGUTIL_H */
