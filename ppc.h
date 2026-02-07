@@ -12,16 +12,16 @@
 
 #include <stdint.h>
 
-typedef struct {
-	uint8_t 		data;		/* integrer data 0-255 */
-} MemorySlot;
+struct PPC_Register {
+	uint8_t			gpr[3];		/* general purpose register */
+};
 
 struct PPC_Runtime {
 	uint16_t 		line;		/* line number for running process */
-	uint8_t			gpr[3];		/* general purpose register */
+	struct PPC_Register 	registers;	/* register slots */
 	uint32_t 		pointer; 	/* current memory pointer/stack pointer */
-	MemorySlot *		slots;		/* the memory slots */
-	uint32_t 		slots_capacity;	/* memory slots capacity */
+	uint8_t	*		memory;		/* the memory (0-255) */
+	uint32_t 		memory_capacity;/* memory capacity */
 };
 
 struct PPC_State {

@@ -28,13 +28,13 @@ void ppc_init(void)
 {
 	ppc_runtime.line = 0;
 	ppc_runtime.pointer = 0;
-	ppc_runtime.slots_capacity = INITIAL_SLOTSIZE;
-	ppc_runtime.slots = malloc(ppc_runtime.slots_capacity * sizeof(MemorySlot));
+	ppc_runtime.memory_capacity = INITIAL_SLOTSIZE;
+	ppc_runtime.memory = malloc(ppc_runtime.memory_capacity);
 }
 
 void ppc_halt(void)
 {
-	free(ppc_runtime.slots);
+	free(ppc_runtime.memory);
 	exit(0);
 }
 

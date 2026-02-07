@@ -16,7 +16,7 @@ struct PPC_Instr {
 /* Macro to create a function */
 #define MKINSTR(name) \
     PPC_Value name##_handler(INSTR_PARAM); \
-    __attribute__((used, section("ppc_instr"))) \
+    __attribute__((used, retain, section("ppc_instr"))) \
     static const struct PPC_Instr _entry_##name = { #name, name##_handler }; \
     PPC_Value name##_handler(INSTR_PARAM)
 

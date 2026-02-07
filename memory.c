@@ -14,7 +14,7 @@
  */
 int out_bounds_check(int idx)
 {
-	int capacity = ppc_runtime.slots_capacity;
+	int capacity = ppc_runtime.memory_capacity;
 
 	if (idx < 0 || idx >= capacity)
 		return -1;
@@ -34,19 +34,18 @@ int mem_expand(int size)
 		return -1;
 	}
 
-	int capacity = ppc_runtime.slots_capacity;
+	int capacity = ppc_runtime.memory_capacity;
 	int add_capacity = capacity + size + 1;
-	int new_capacity = add_capacity * sizeof(MemorySlot);
 
-	void *tmp = realloc(ppc_runtime.slots, new_capacity);
+	void *tmp = realloc(ppc_runtime.memory, add_capacity);
 	if (unlikely(!tmp)) {
 		console_errno();
 		return -1;
 	}
 
-	ppc_runtime.slots = tmp;
-	ppc_runtime.slots_capacity = add_capacity;
-	return new_capacity;
+	ppc_runtime.memory = tmp;
+	ppc_runtime.memory_capacity = add_capacity;
+	return add_capacity;
 }
 
 /* mem_write(idx, c) - write c into memory idx
@@ -57,7 +56,7 @@ int mem_write(int idx, uint8_t c)
 	int bounds = out_bounds_check(idx);
 
 	if (bounds <= -2) {
-		console_err("Invalid size %d", ppc_runtime.slots_capacity);
+		console_err("Invalid size %d", ppc_runtime.memory_capacity);
 		return -1;
 	}
 
@@ -68,7 +67,7 @@ int mem_write(int idx, uint8_t c)
 		}
 	}
 
-	ppc_runtime.slots[idx].data = c;
+	ppc_runtime.memory[idx] = c;
 	return 0;
 }
 
@@ -78,7 +77,7 @@ int mem_get(int idx)
 	int bounds = out_bounds_check(idx);
 
 	if (bounds <= -2) {
-		console_err("Invalid size %d", ppc_runtime.slots_capacity);
+		console_err("Invalid size %d", ppc_runtime.memory_capacity);
 		return -1;
 	}
 
@@ -87,5 +86,5 @@ int mem_get(int idx)
 		return -1;
 	}
 
-	return ppc_runtime.slots[idx].data;
+	return ppc_runtime.memory[idx];
 }

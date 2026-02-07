@@ -8,6 +8,11 @@
 #include <ctype.h>
 #include <stdio.h>
 
+STATIC void expect(int c)
+{
+	console_err("'%c' expected", c);
+}
+
 /* --- The Parser Core --- */
 
 // Helper: Skip whitespace & commas
@@ -91,8 +96,7 @@ struct ASTNode *parse_expr(char **cursor)
 		if (**cursor == PARSER_TOK_SUBEVAL_CLOSE)
 			(*cursor)++;	// skip close
 		else
-			console_warn("Expected '%c' after '%c' (pair of '%c')",
-				PARSER_TOK_SUBEVAL_CLOSE, *(*cursor - 2), PARSER_TOK_SUBEVAL_OPEN);
+			expect(PARSER_TOK_SUBEVAL_CLOSE);
 
 		return cmd_node;
 	}
