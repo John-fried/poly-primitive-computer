@@ -12,9 +12,8 @@ int main(int argc, char **argv)
 {
 	ppc_init();
 	FILE *fp;
-	size_t len = 0;
 	int i = 1;
-	char *line = NULL;
+	char line[LINESIZE];
 
 	if (argc == 1) {
 		console_err("No input files");
@@ -30,8 +29,10 @@ int main(int argc, char **argv)
 	struct PPC_Ctx ctx;
 	init_ctx(&ctx);
 
-	while ((getline(&line, &len, fp)) != -1) {
+	while (fgets(line, sizeof(line), fp) != NULL) {
+		line[strlen(line) - 1] = '\0';	/* remove newline character */
 		ppc_runtime.line = i++;
+
 		struct ASTNode *node = parser_parse_line(line);
 		if (node) {
 			eval_ast(node);
@@ -39,6 +40,5 @@ int main(int argc, char **argv)
 		}
 	}
 	fclose(fp);
-	free(line);
 	return 0;
 }

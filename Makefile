@@ -1,5 +1,5 @@
 TARGET = ppc
-FLAGS = -MMD -Wall -Wextra -Wpedantic -I. -s -O3 -ffunction-sections -fdata-sections
+FLAGS = -MMD -Wall --std=c11 -Wextra -Wpedantic -I. -s -O3 -ffunction-sections -fdata-sections
 
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj

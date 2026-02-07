@@ -1,5 +1,6 @@
 #include "ppc.h"
 #include "ast.h"
+#include "c11util.h"
 #include "console.h"
 #include "parser.h"
 
@@ -14,7 +15,7 @@ struct ASTNode *ast_create(NodeType type, char *token)
 {
 	struct ASTNode *node = malloc(sizeof(struct ASTNode));
 	node->type = type;
-	node->token = token ? strdup(token) : NULL;
+	node->token = token ? c11_strdup(token) : NULL;
 	node->argc = 0;
 	node->capacity = 2;
 	node->args = malloc(sizeof(struct ASTNode *) * node->capacity);
@@ -64,7 +65,7 @@ STATIC struct ASTNode *parse_string(char **cursor)
 
 	int len = *cursor - start;
 	char *val = malloc(len + 1);
-	strncpy(val, start, len);
+	memcpy(val, start, len);
 	val[len] = '\0';
 
 	if (**cursor == '"')
@@ -216,15 +217,14 @@ void find_range(const char *str, int *min, int *max)
 	char *result;
 
 	if ((result = strstr(str, ".."))) {
-		int str_len = strlen(str);
-		int result_len = strlen(result);
-		char *strtemp = strdup(str);
-		strtemp[str_len - (result_len)] = 0;	/* "n1\0.n2" */
+		char strtemp[16];
+		int len = result - str;
+
+		memcpy(strtemp, str, len);
+		strtemp[len] = '\0';
 
 		int n1 = atoi(strtemp);
-		free(strtemp);
-
-		int n2 = atoi(str + (str_len - (result_len - 2)));
+		int n2 = atoi(result + 2);
 
 		if (n1 > n2) {
 			*min = n2;
