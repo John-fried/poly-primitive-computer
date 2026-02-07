@@ -8,7 +8,9 @@ char *c11_strdup(char *s)
 {
 	int len = strlen(s);
 	char *dst = malloc(len + 1);
-	if (dst != NULL)
+	if (dst != NULL) {
 		memcpy(dst, s, len);
+		dst[len] = '\0';
+	}
 	return dst;
 }
