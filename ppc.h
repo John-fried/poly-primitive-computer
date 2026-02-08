@@ -1,10 +1,11 @@
 #ifndef PPC_H
 #define PPC_H
 
+#define MEM_SIZE		65536
 #define LINESIZE 		256
 #define ARGSSIZE 		32
-#define INITIAL_SLOTSIZE 	8
 
+/*************************************************/
 #define likely(x)     		__builtin_expect(!!(x), 1)
 #define unlikely(x)    		__builtin_expect(!!(x), 0)
 
@@ -32,8 +33,7 @@ struct PPC_Runtime {
 	uint16_t 		line;		/* line number for running process */
 	struct PPC_Register 	registers;	/* register slots */
 	uint32_t 		pointer; 	/* current memory pointer/stack pointer */
-	uint8_t	*		memory;		/* the memory (0-255) */
-	uint32_t 		memory_capacity;/* memory capacity */
+	uint8_t			memory[MEM_SIZE];/* the memory (0-255) */
 };
 
 struct PPC_State {
