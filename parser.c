@@ -60,8 +60,11 @@ ST_FUNC struct ASTNode *parse_word(void)
 	       && *cursor != PARSER_TOK_SUBEVAL_CLOSE)
 		advance();
 
+	if (start == cursor)
+		return NULL;
 	int len = cursor - start;
-	if (len <= 0) return NULL;
+	if (len <= 0)
+		return NULL;
 
 	char *val = malloc(len + 1);
 	memcpy(val, start, len);
@@ -144,6 +147,10 @@ struct ASTNode *parser_parse_line(char *line)
 		struct ASTNode *arg = parse_expr();
 		if (arg)
 			ast_add_arg(root, arg);
+		else {
+			console_err("Unexpected character '%c'", *cursor);
+			advance();
+		}
 	}
 
 	return root;
@@ -154,7 +161,7 @@ struct ASTNode *parser_parse_line(char *line)
 int isnumeric(char *s)
 {
 	if (*s == '\0') return 0;
-	if (*s == '-') s++;
+	if (*s == '-' && isdigit(*++s)) s++;
 
 	for (; *s; s++)
 		if (!isdigit((unsigned char)*s)) return 0;

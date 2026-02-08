@@ -4,7 +4,7 @@ BINDIR = $(PREFIX)/bin
 
 CFLAGS = -MMD -Wall -Wextra -Wpedantic -std=c11 -I.
 LDFLAGS = -Wl,--gc-sections
-RELEASE_FLAGS = -O3 -s -ffunction-sections -fdata-sections
+RELEASE_FLAGS = -Os -s -ffunction-sections -fdata-sections
 DEBUG_FLAGS = -g -O0 -DDEBUG
 
 BUILD_DIR = build

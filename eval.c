@@ -15,6 +15,13 @@
 extern const struct PPC_Instr __start_ppc_instr;
 extern const struct PPC_Instr __stop_ppc_instr;
 
+ST_INLN uint16_t get_hash(char *s) {
+	if (!s || !s[0]) return 0;
+	uint16_t h = ((uint16_t)s[0]) << 8;
+	if (s[1]) h |= (uint8_t)s[1];
+	return h ^ (uint16_t)strlen(s);
+}
+
 PPC_Value eval_ast(struct ASTNode *node)
 {
 	if (!node || !node->token[0]) return VAL_ERROR;
@@ -33,59 +40,51 @@ PPC_Value eval_ast(struct ASTNode *node)
 			return VAL_ERROR;
 	}
 
-	char *buff_to_free[ARGSSIZE];
-	PPC_Value final_res = VAL_ERROR; /* Val error for the first, will be overwritten or even still */
-
 exec_expression: {
+	char int_pool[ARGSSIZE][12];
 	const struct PPC_Instr *it = &__start_ppc_instr;
 	const struct PPC_Instr *found = NULL; /* Found instruction */
 
 	struct PPC_Ctx ctx;
 	init_ctx(&ctx);
 
+	uint16_t search_hash = get_hash(node->token);
 	ctx.argc = node->argc + 1;	/* +1 as instruction name */
 	ctx.argv[0] = node->token;	/* instruction name */
 	ctx.state.pipeline = (node->type == NODE_EXPR); /* Only mark as pipeline if type as expr */
 
 	for (; it < &__stop_ppc_instr; it++) {
-		if (strcmp(it->name, node->token) == 0) {
+		if (it->opcode == search_hash) {
 			found = it;
 			break;
 		}
 	}
 
 	if (!found) {
-		console_err("unknown %s", node->token);
+		console_err("%d: Unrecognized opcode \"%s\"", search_hash,
+			node->token);
 		return VAL_ERROR;
 	}
 
 	for (int i = 0; i < node->argc; i++) {
+		if (unlikely(i >= ARGSSIZE)) {
+			console_err("Too many arguments!");
+			return VAL_ERROR;
+		}
+
 		/* Recursive call: to get the preprocessed strings */
 		PPC_Value res = eval_ast(node->args[i]);
 
 		if (res.type == VAL_INTEGRER) {
-			char *buf = malloc(12);
-
-			if (unlikely(!buf))
-				goto err_malloc;
-
-			sprintf(buf, "%d", res.value);
-			ctx.argv[i+1] = buf;	/* +1 to avoid overwriting the instruction name */
-			buff_to_free[i] = buf;	/* points buff[i] to the address of buf */
+			snprintf(int_pool[i], 12, "%d", res.value);
+			ctx.argv[i+1] = int_pool[i];	/* +1 to avoid overwritting the instruction name */
 		} else {
 			ctx.argv[i+1] = res.string;
-			buff_to_free[i] = NULL;	/* Marks as doesn't need to be freed */
 		}
 	}
 
 	/* Root call or Final call after preprocessing */
-	final_res = found->handler(&ctx);
-}
-
-err_malloc:
-	for (int i = 0; i< node->argc; i++) {
-		if (buff_to_free[i]) free(buff_to_free[i]);
-	}
-
+	PPC_Value final_res = found->handler(&ctx);
 	return final_res;
+}
 }
