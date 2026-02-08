@@ -39,7 +39,7 @@ ST_FUNC struct ASTNode *parse_string(void)
 		advance();
 
 	int len = cursor - start;
-	char *val = malloc(len + 1);
+	char val[len + 1];
 	memcpy(val, start, len);
 	val[len] = '\0';
 
@@ -47,7 +47,6 @@ ST_FUNC struct ASTNode *parse_string(void)
 		(*cursor)++;	// Skip closing quote
 
 	struct ASTNode *node = ast_create(NODE_STR, val);
-	free(val);
 	return node;
 }
 
@@ -66,7 +65,7 @@ ST_FUNC struct ASTNode *parse_word(void)
 	if (len <= 0)
 		return NULL;
 
-	char *val = malloc(len + 1);
+	char val[len + 1];
 	memcpy(val, start, len);
 	val[len] = '\0';
 
@@ -77,7 +76,6 @@ ST_FUNC struct ASTNode *parse_word(void)
 	}
 
 	struct ASTNode *node = ast_create(type, val);
-	free(val);
 	return node;
 }
 
