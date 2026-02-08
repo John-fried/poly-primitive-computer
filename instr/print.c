@@ -17,16 +17,16 @@ MKINSTR(print)
 
 	for (int i = 1; i < ctx->argc; i++) {
 		/* find range between n1..n2 */
-		if (strstr(ctx->argv[i], "..")) {
+		if (strstr(ctx->argv[i].string, "..")) {
 			int min, max;
 
-			find_range(ctx->argv[i], &min, &max);
+			find_range(ctx->argv[i].string, &min, &max);
 			for (int j = min; j <= max; j++) {
 				c = mem_get(j);
 				write(1, &c, 1);
 			}
 		} else {
-			c = mem_get(atoi(ctx->argv[i]));
+			c = mem_get(ctx->argv[i].value);
 			write(1, &c, 1);
 		}
 	}

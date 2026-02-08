@@ -19,7 +19,7 @@ struct PPC_Runtime ppc_runtime;
 void init_ctx(struct PPC_Ctx *ctx)
 {
 	ctx->runtime = &ppc_runtime;
-	ctx->argv[0] = NULL;
+	ctx->argv[0] = VAL_NULL;
 	ctx->argc = 0;
 	ctx->state.pipeline = 0;
 }

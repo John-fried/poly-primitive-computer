@@ -21,7 +21,6 @@ struct ASTNode {
 struct ASTNode *ast_create(NodeType type, char *token);
 void ast_add_arg(struct ASTNode *parent, struct ASTNode *child);
 void ast_free(struct ASTNode *node);
-void ast_print(struct ASTNode *node, int level); // for debug
 
 #ifdef PARSER_DEBUG
 void ast_print(struct ASTNode *node, int level);

@@ -29,6 +29,7 @@ struct PPC_Instr {
 	PPC_Value name##_handler(INSTR_PARAM)
 
 /* Macro for return value */
+#define VAL_NULL		(PPC_Value){VAL_NULL, "", 0}
 #define VAL_ERROR 		(PPC_Value){VAL_INTEGRER, "", 1}
 #define VAL_SUCCESS 		(PPC_Value){VAL_INTEGRER, "", 0}
 #define VAL_STR(x)		(PPC_Value){VAL_STRING, x, 0}

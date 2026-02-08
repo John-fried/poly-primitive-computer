@@ -41,7 +41,6 @@ PPC_Value eval_ast(struct ASTNode *node)
 	}
 
 exec_expression: {
-	char int_pool[ARGSSIZE][12];
 	const struct PPC_Instr *it = &__start_ppc_instr;
 	const struct PPC_Instr *found = NULL; /* Found instruction */
 
@@ -50,7 +49,7 @@ exec_expression: {
 
 	uint16_t search_hash = get_hash(node->token);
 	ctx.argc = node->argc + 1;	/* +1 as instruction name */
-	ctx.argv[0] = node->token;	/* instruction name */
+	ctx.argv[0] = VAL_STR(node->token);	/* instruction name */
 	ctx.state.pipeline = (node->type == NODE_EXPR); /* Only mark as pipeline if type as expr */
 
 	for (; it < &__stop_ppc_instr; it++) {
@@ -61,8 +60,7 @@ exec_expression: {
 	}
 
 	if (!found) {
-		console_err("%d: Unrecognized opcode \"%s\"", search_hash,
-			node->token);
+		console_err("Unrecognized opcode %d \"%s\"", search_hash, node->token);
 		return VAL_ERROR;
 	}
 
@@ -71,16 +69,8 @@ exec_expression: {
 			console_err("Too many arguments!");
 			return VAL_ERROR;
 		}
-
-		/* Recursive call: to get the preprocessed strings */
-		PPC_Value res = eval_ast(node->args[i]);
-
-		if (res.type == VAL_INTEGRER) {
-			snprintf(int_pool[i], 12, "%d", res.value);
-			ctx.argv[i+1] = int_pool[i];	/* +1 to avoid overwritting the instruction name */
-		} else {
-			ctx.argv[i+1] = res.string;
-		}
+		/* Here the Recursive Call; Preprocess argument first */
+		ctx.argv[i+1] = eval_ast(node->args[i]);
 	}
 
 	/* Root call or Final call after preprocessing */

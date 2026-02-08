@@ -25,6 +25,18 @@
 
 #include <stdint.h>
 
+typedef enum {
+	VAL_NULL,
+	VAL_STRING,
+	VAL_INTEGRER
+} ValueType;
+
+typedef struct PPC_Value {
+	ValueType		type;		/* Value type */
+	char *			string;		/* If the value type is string */
+	int 			value;		/* If the value type is integrer */
+} PPC_Value;
+
 struct PPC_Register {
 	uint8_t			gpr[3];		/* general purpose register */
 };
@@ -42,7 +54,7 @@ struct PPC_State {
 
 struct PPC_Ctx {
 	uint8_t 		argc;		/* arguments count */
-	char *			argv[ARGSSIZE]; /* arguments vector */
+	PPC_Value		argv[ARGSSIZE]; /* arguments vector */
 	struct PPC_Runtime *	runtime;	/* runtime link */
 	struct PPC_State	state;		/* state dataa */
 };
@@ -51,17 +63,6 @@ struct PPC_Reg {
 	char			alias[16];	/* reg alias, example: sp */
 	void *			setter;		/* setter, a value to be changed*/
 };
-
-typedef enum {
-	VAL_STRING,
-	VAL_INTEGRER
-} ValueType;
-
-typedef struct PPC_Value {
-	ValueType		type;		/* Value type */
-	char *			string;		/* If the value type is string */
-	int 			value;		/* If the value type is integrer */
-} PPC_Value;
 
 /* Global state */
 extern struct PPC_Runtime ppc_runtime;
